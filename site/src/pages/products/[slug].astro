@@ -1,0 +1,232 @@
+---
+/**
+ * /products/<slug>: one template for the six instruments (the van has its own page,
+ * /cable-test-van). Port of design/mockups/product-*.html; layout reference
+ * product-tdr-901.html. Everything comes from the product's Markdown file
+ * (src/content/products, schema in src/content.config.ts). Section order:
+ *   breadcrumb, gallery + nameplate + key figures, Where it fits,
+ *   Overview (body) or the 'arc-reflection' bespoke section, Specifications,
+ *   In the box, the 'surge-compare' bespoke section, Works with, quote band.
+ */
+import { Picture } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Gallery from '../../components/Gallery.astro';
+import KeyFigures from '../../components/KeyFigures.astro';
+import AddToQuote from '../../components/AddToQuote.astro';
+import Button from '../../components/Button.astro';
+import WorkflowLine from '../../components/WorkflowLine.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import NameplateTile from '../../components/NameplateTile.astro';
+import QuoteBand from '../../components/QuoteBand.astro';
+import Slot from '../../components/Slot.astro';
+import ArcReflection from '../../components/product/ArcReflection.astro';
+import SurgeCompare from '../../components/product/SurgeCompare.astro';
+import { getFamily } from '../../data/families';
+import { askHref, getInstruments, getProductsBySlugs, type Product } from '../../lib/products';
+import { breadcrumbList, productJsonLd, productTitle } from '../../lib/jsonld';
+import { inline } from '../../lib/inline';
+import { SITE } from '../../data/site';
+import '../../styles/pages-a.css';
+
+export async function getStaticPaths() {
+  const instruments = await getInstruments();
+  return instruments.map((product) => ({ params: { slug: product.data.slug }, props: { product } }));
+}
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const d = product.data;
+const family = getFamily(d.family);
+const familyHref = `/products#${family.id}`;
+const { Content } = await render(product);
+const hasOverview = Boolean(product.body?.trim());
+const worksWith = await getProductsBySlugs(d.worksWith);
+const boxFigure = d.inTheBoxFigure;
+const boxImage = boxFigure ? d.images[boxFigure.image] : undefined;
+if (boxFigure && !boxImage) throw new Error(`${d.slug}: inTheBoxFigure.image ${boxFigure.image} is not in images`);
+
+const jsonLd = [
+  await productJsonLd(product, `Cable fault location: ${family.name}`),
+  breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Products', path: '/products' },
+    { name: d.model, path: `/products/${d.slug}` },
+  ]),
+];
+const lead = d.images[0];
+---
+<BaseLayout
+  title={`${productTitle(product)} | ${SITE.name}`}
+  description={d.seo?.description ?? d.description}
+  ogType="product"
+  ogImage={lead?.src}
+  ogImageAlt={lead?.alt}
+  jsonLd={jsonLd}
+>
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/products">Products</a></li>
+        <li><a href={familyHref}>{family.name}</a></li>
+        <li><span aria-current="page">{d.model}</span></li>
+      </ol>
+    </nav>
+
+    <div class="product-hero">
+      <Gallery product={product} />
+
+      <div class="product-info">
+        <p class="family-line">Step {family.step} of 4: <a href={familyHref}>{family.name}</a></p>
+        <h1>
+          <span class="nameplate">{d.model}</span>
+          <span class="product-name">{d.name}</span>
+        </h1>
+        <p class="product-lede">{d.description}</p>
+        <KeyFigures product={product} />
+        <div class="btn-row">
+          <AddToQuote id={d.model} variant="primary" size="md" srName={false} />
+          <Button variant="secondary" href={askHref(product, SITE.email)}>Ask a question</Button>
+        </div>
+        {
+          d.datasheet ? (
+            <p class="datasheet">
+              <a href={d.datasheet.url}>Datasheet (PDF)</a> {d.datasheet.note && <span>{d.datasheet.note}</span>}
+            </p>
+          ) : (
+            <p class="datasheet datasheet--none">
+              <span>Datasheet in preparation.</span>
+            </p>
+          )
+        }
+        <p class="sr-only" id="quote-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <section class="section" aria-labelledby="fit-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="fit-title">Where it fits</h2>
+        {d.fitLead && <p class="lead">{d.fitLead}</p>}
+      </div>
+      <WorkflowLine variant="compact" current={d.slug} />
+    </div>
+  </section>
+
+  {d.bespokeSection === 'arc-reflection' && <ArcReflection />}
+
+  {
+    hasOverview && (
+      <section class="section section--white" aria-labelledby="overview-title">
+        <div class="wrap split">
+          <div class="split__head">
+            <h2 id="overview-title">Overview</h2>
+          </div>
+          <div class="split__body--narrow prose measure">
+            <Content />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    d.specs.length > 0 && (
+      <section class="section" aria-labelledby="specs-title">
+        <div class="wrap split">
+          <div class="split__head">
+            <h2 id="specs-title">Specifications</h2>
+            {d.specsSource && <p class="muted small">{d.specsSource}</p>}
+          </div>
+          <div class="split__body">
+            <SpecTable groups={d.specs} />
+            {d.specsNote && (
+              <p class="spec-note">
+                <Fragment set:html={inline(d.specsNote.text)} />
+                {d.specsNote.slot && (
+                  <>
+                    {' '}
+                    <Slot text={d.specsNote.slot} />
+                  </>
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    d.inTheBox.length > 0 && (
+      <section class="section section--white" aria-labelledby="box-title">
+        <div class="wrap split">
+          <div class="split__head">
+            <h2 id="box-title">In the box</h2>
+            {d.inTheBoxNote && <p class="muted small">{d.inTheBoxNote}</p>}
+          </div>
+          <div class="split__body inbox">
+            <ul class="inbox__list">
+              {d.inTheBox.map((item) => (
+                <li>
+                  <span>{item.item}</span>
+                  {item.qty && <span class="qty">{item.qty}</span>}
+                </li>
+              ))}
+            </ul>
+            {boxFigure && boxImage && (
+              <figure>
+                <div class="plate">
+                  <Picture
+                    src={boxImage.src}
+                    formats={['avif', 'webp']}
+                    widths={[480, 800, 1200, 1600]}
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    alt={boxFigure.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption class="figure-caption">
+                  {boxFigure.caption}
+                  {boxFigure.slot && (
+                    <>
+                      {' '}
+                      <Slot text={boxFigure.slot} />
+                    </>
+                  )}
+                </figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {d.bespokeSection === 'surge-compare' && <SurgeCompare />}
+
+  {
+    worksWith.length > 0 && (
+      <section class="section" aria-labelledby="works-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="works-title">Works with</h2>
+            {d.worksWithLead && <p class="lead">{d.worksWithLead}</p>}
+          </div>
+          <div class="tiles tiles--3">
+            {worksWith.map((p) => (
+              <NameplateTile product={p} sizes="(min-width: 1100px) 33vw, (min-width: 600px) 50vw, 100vw" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {d.quoteBand && <QuoteBand heading={d.quoteBand.heading} lead={d.quoteBand.lead} model={d.model} />}
+</BaseLayout>

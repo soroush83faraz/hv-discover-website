@@ -1,0 +1,57 @@
+# HV Discover form API (deployed at /api/).
+# Only quote.php, contact.php and token.php can be requested. Everything else here is
+# denied: lib/, config.php, config.sample.php, data/, tests/, *.md, .user.ini, backups,
+# editor swap files, anything added later. The PHP code also guards lib/ and config files,
+# so a host that ignores this file still executes nothing it should not.
+#
+# Only directives normally allowed in .htaccess on shared hosting are used. If the host
+# answers 500 for every /api/* URL, its error log names the directive it does not allow:
+# "Options -Indexes" and "AcceptPathInfo Off" may be deleted (the deny rules below already
+# block directory listings and the code refuses PATH_INFO); never delete the deny rules.
+
+Options -Indexes
+
+# The allow rule matches file NAMES, also inside subfolders: never create a file called
+# quote.php, contact.php or token.php anywhere below api/ except these three.
+<IfModule mod_authz_core.c>
+    Require all denied
+    <FilesMatch "^(quote|contact|token)\.php$">
+        Require all granted
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order Deny,Allow
+    Deny from all
+    <FilesMatch "^(quote|contact|token)\.php$">
+        Order Allow,Deny
+        Allow from all
+    </FilesMatch>
+</IfModule>
+
+# No /api/quote.php/anything variants.
+AcceptPathInfo Off
+
+# PHP settings for hosts running PHP as an Apache module. Hosts using PHP-FPM, CGI or
+# LiteSpeed read api/.user.ini instead (same values).
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_flag mail.add_x_header Off
+    php_value post_max_size 64K
+    php_value max_input_vars 50
+    php_value max_input_nesting_level 8
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_flag mail.add_x_header Off
+    php_value post_max_size 64K
+    php_value max_input_vars 50
+    php_value max_input_nesting_level 8
+</IfModule>
+
+# Optional: let Apache refuse large bodies before PHP runs. Needs "AllowOverride All";
+# on hosts that do not allow it here this line causes a 500, so it is off by default.
+# The PHP code enforces the same 64 KB limit either way.
+# LimitRequestBody 65536
+
+# Optional: config file outside the web root under another name.
+# SetEnv HVD_CONFIG /home/USER/domains/hvdiscover.com/hvd-private/config.php

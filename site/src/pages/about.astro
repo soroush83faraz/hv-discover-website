@@ -1,0 +1,188 @@
+---
+/**
+ * About: port of design/mockups/about.html (pages-b.css).
+ * What we supply (kit photo + the four steps with their instruments), In numbers, How we
+ * work, Where we are, and the contact band.
+ *
+ * "In numbers": the mockup shows four empty readouts with slots "for review" and notes that
+ * each figure stays hidden on the live site until it is confirmed (docs/05-decisions.md:
+ * facts are shown only when filled). Fill `value` in FACTS below to show a figure; the
+ * section appears as soon as one figure has a value.
+ */
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import Slot from '../components/Slot.astro';
+import { SITE } from '../data/site';
+import { breadcrumbs } from '../lib/structured-data';
+import tdrKit from '../assets/img/tdr-901-kit.jpg';
+import '../styles/pages-b.css';
+
+interface Fact {
+  label: string;
+  /** Confirmed figure, e.g. "2009". null keeps the fact off the page. */
+  value: string | null;
+}
+const FACTS: Fact[] = [
+  { label: 'Founded', value: null },
+  { label: 'Instruments in the field', value: null },
+  { label: 'Countries supplied', value: null },
+  { label: 'Certifications', value: null },
+];
+const facts = FACTS.filter((f): f is Fact & { value: string } => f.value !== null);
+---
+<BaseLayout
+  title="About HV Discover: one range for the fault-location chain"
+  description="HV Discover supplies instruments that find faults in underground medium-voltage cables, from the first pulse to the dig spot, and the van that carries them."
+  jsonLd={[breadcrumbs([{ name: 'About', path: '/about' }])]}
+>
+  <div class="wrap page-head">
+    <h1 class="page-title">One range for the whole <span class="nowrap">fault-location</span> chain</h1>
+    <p class="page-head__sub">HV Discover supplies the instruments that find faults in underground medium-voltage cables, from the first pulse to the dig spot, and the van that carries them.</p>
+  </div>
+
+  <!-- what we supply -->
+  <section class="section section--white" aria-labelledby="make-title">
+    <div class="wrap">
+      <div class="about-chain">
+        <figure class="about-chain__photo">
+          <div class="plate">
+            <Picture
+              src={tdrKit}
+              formats={['avif', 'webp']}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 1024px) 58vw, 100vw"
+              loading="lazy"
+              decoding="async"
+              alt="The TDR-901 kit laid out: the reflectometer in its open orange case with test leads, a mains adapter and a coupler."
+            />
+          </div>
+        </figure>
+        <div class="about-chain__copy">
+          <h2 id="make-title">What we supply</h2>
+          <p>Six instruments in four steps: a reflectometer and arc reflection filter to pre-locate, two surge generators to condition the fault, an acoustic pinpointer and a route tracer. Each works alone, and each hands over to the next.</p>
+          <p>A cable test van carries the same four steps, fitted and wired, so a crew arrives with the whole sequence on board.</p>
+        </div>
+      </div>
+      <ol class="stations stations--compact about-steps" aria-label="The four steps and their instruments">
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <span class="station__num" aria-hidden="true">1</span>
+          <h3><span class="sr-only">Step 1: </span><a href="/fault-location#step-1">Pre-locate</a></h3>
+          <ul class="station__products">
+            <li><a href="/products/tdr-901-time-domain-reflectometer"><span class="station__model">TDR-901</span> <span class="station__pname">Time domain reflectometer</span></a></li>
+            <li><a href="/products/arm-filter"><span class="station__model">ARM Filter</span> <span class="station__pname">Arc reflection filter</span></a></li>
+          </ul>
+        </li>
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <span class="station__num" aria-hidden="true">2</span>
+          <h3><span class="sr-only">Step 2: </span><a href="/fault-location#step-2">Condition</a></h3>
+          <ul class="station__products">
+            <li><a href="/products/pg-10-surge-generator"><span class="station__model">PG-10</span> <span class="station__pname">Surge generator, 10 kV</span></a></li>
+            <li><a href="/products/pg-32-surge-generator"><span class="station__model">PG-32</span> <span class="station__pname">Surge generator, 30 kV</span></a></li>
+          </ul>
+        </li>
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <span class="station__num" aria-hidden="true">3</span>
+          <h3><span class="sr-only">Step 3: </span><a href="/fault-location#step-3">Pinpoint</a></h3>
+          <ul class="station__products">
+            <li><a href="/products/ap-01-acoustic-pinpointer"><span class="station__model">AP-01</span> <span class="station__pname">Acoustic pinpointer</span></a></li>
+          </ul>
+        </li>
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <span class="station__num" aria-hidden="true">4</span>
+          <h3><span class="sr-only">Step 4: </span><a href="/fault-location#step-4">Trace route</a></h3>
+          <ul class="station__products">
+            <li><a href="/products/crt-015-cable-route-tracer"><span class="station__model">CRT-015</span> <span class="station__pname">Cable route tracer</span></a></li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- facts: shown once a figure is confirmed (see FACTS above) -->
+  {
+    facts.length > 0 && (
+      <section class="section" aria-labelledby="facts-title">
+        <div class="wrap">
+          <div class="section-head">
+            <h2 id="facts-title">In numbers</h2>
+            <p class="lead">Figures appear here as they are confirmed. We would rather show an empty display than a guess.</p>
+          </div>
+          <dl class="facts">
+            {facts.map((f) => (
+              <div class="fact">
+                <dt>{f.label}</dt>
+                <dd>
+                  <span class="fact__reading">{f.value}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- how we work -->
+  <section class="section section--white" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="work-title">How we work</h2>
+        <p class="lead">What happens to each instrument, from the specification to service in the field.</p>
+      </div>
+      <div class="support-cols">
+        <div class="support-col">
+          <h3>Range</h3>
+          <p>Each instrument is chosen around the fault-location sequence: the PG-32 connects to the TDR-901 for arc reflection, and its surges are what the AP-01 listens for.</p>
+        </div>
+        <div class="support-col">
+          <h3>Test</h3>
+          <p>The TDR-901, PG-32 and AP-01 datasheets list a calibration approval and certificate with each instrument.</p>
+        </div>
+        <div class="support-col">
+          <h3>Train</h3>
+          <p>Operator training on each instrument and on the whole sequence. Ask for it with your quote.</p>
+        </div>
+        <div class="support-col">
+          <h3>Support</h3>
+          <p>We answer questions and trace readings by email.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- where -->
+  <section class="section" aria-labelledby="where-title">
+    <div class="wrap split">
+      <div class="split__head">
+        <h2 id="where-title">Where we are</h2>
+      </div>
+      <div class="split__body--narrow">
+        <dl class="contact-list">
+          <div><dt>Office</dt><dd><address>{SITE.address.map((line, i) => (i < SITE.address.length - 1 ? <>{line}<br /></> : line))}</address></dd></div>
+          <div><dt>Office hours</dt><dd>{SITE.hours}</dd></div>
+          <div><dt>Company</dt><dd><Slot text="registered company name" /></dd></div>
+          <div><dt>Registered office</dt><dd>{SITE.address.join(', ')}</dd></div>
+          <div><dt>Email</dt><dd><a class="big" href={`mailto:${SITE.email}`}>{SITE.email}</a></dd></div>
+          <div><dt>Support</dt><dd>We reply by email</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- contact band -->
+  <QuoteBand
+    heading="Talk to us."
+    lead="About a network, a fault you can’t find, or which instruments you need."
+  >
+    <div class="btn-row" slot="actions">
+      <Button href="/contact">Contact us</Button>
+      <Button variant="secondary" href="/request-a-quote">Request a quote</Button>
+    </div>
+  </QuoteBand>
+</BaseLayout>

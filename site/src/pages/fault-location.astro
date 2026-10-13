@@ -1,0 +1,528 @@
+---
+/**
+ * How cable fault location works: port of design/mockups/fault-location.html (pages-b.css).
+ * Graticule head with the four steps as the page index, fault types, the cable
+ * cross-section, the four method steps with their diagrams (wide and narrow SVG variants,
+ * switched in CSS at 600px), the van, and the quote band. Step 1 holds the interactive
+ * TDR lab (src/scripts/method.ts).
+ */
+import { getImage, Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import { absoluteUrl, breadcrumbs, organizationRef } from '../lib/structured-data';
+import vanInterior from '../assets/img/van-interior.jpg';
+import '../styles/pages-b.css';
+
+const title = 'How cable fault location works | HV Discover';
+const description =
+  'How an underground medium-voltage cable fault is found: fault types, the cable, then four steps from TDR pre-location to route tracing.';
+const articleImage = await getImage({ src: vanInterior, width: 1200, format: 'jpg' });
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'How cable fault location works',
+  description,
+  inLanguage: 'en-GB',
+  url: absoluteUrl('/fault-location'),
+  mainEntityOfPage: absoluteUrl('/fault-location'),
+  image: absoluteUrl(articleImage.src),
+  about: { '@type': 'Thing', name: 'Fault location in underground medium-voltage power cables' },
+  proficiencyLevel: 'Beginner',
+  author: organizationRef(),
+  publisher: organizationRef(),
+};
+---
+<BaseLayout
+  title={title}
+  description={description}
+  ogType="article"
+  jsonLd={[article, breadcrumbs([{ name: 'Fault location', path: '/fault-location' }])]}
+>
+  <!-- HEAD: the method in one line, the four steps as the page index -->
+  <section class="hero hero--page" aria-labelledby="page-title">
+    <div class="wrap hero__inner">
+      <h1 class="display" id="page-title">How cable fault location works</h1>
+      <p class="hero__sub">A buried cable fails somewhere under a street. Finding it takes four measurements, each one narrowing the search: from the whole cable, to a distance in metres, to the spot where you dig.</p>
+
+      <nav aria-label="The four steps on this page">
+        <ol class="stations">
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <span class="station__num" aria-hidden="true">1</span>
+            <p class="h3 station__title"><span class="sr-only">Step 1: </span><a href="#step-1">Pre-locate</a></p>
+            <p class="station__text">A low-voltage pulse and its echo give the distance to the fault.</p>
+          </li>
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <span class="station__num" aria-hidden="true">2</span>
+            <p class="h3 station__title"><span class="sr-only">Step 2: </span><a href="#step-2">Condition</a></p>
+            <p class="station__text">A high-voltage surge makes hidden faults break down and show.</p>
+          </li>
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <span class="station__num" aria-hidden="true">3</span>
+            <p class="h3 station__title"><span class="sr-only">Step 3: </span><a href="#step-3">Pinpoint</a></p>
+            <p class="station__text">The discharge is heard through the ground, loudest above the fault.</p>
+          </li>
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <span class="station__num" aria-hidden="true">4</span>
+            <p class="h3 station__title"><span class="sr-only">Step 4: </span><a href="#step-4">Trace route</a></p>
+            <p class="station__text">The cable path puts the measured distance on the right street.</p>
+          </li>
+        </ol>
+      </nav>
+      <p class="hero__note">Everything on this page is high-voltage work. Isolate, earth and test under your utility&rsquo;s switching and safety rules before connecting any instrument.</p>
+    </div>
+  </section>
+
+  <!-- FAULT TYPES -->
+  <section class="section" id="fault-types" aria-labelledby="types-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="types-title">What a cable fault is</h2>
+        <p class="lead">A point where the insulation between the conductor and the earthed screen has failed, or where the conductor itself is broken. Its resistance decides how you find it.</p>
+      </div>
+      <p class="fault-legend" id="types-legend">In each sketch the top line is the conductor and the bottom line is the earthed metallic screen.</p>
+      <ul class="fault-types" aria-describedby="types-legend">
+        <li class="fault-type plate">
+          <svg viewBox="0 0 240 96" role="img" aria-label="Sketch: the conductor is broken, the screen is intact.">
+            <path class="dg-line-2" d="M12 32H108M132 32H228M108 25V39M132 25V39"/>
+            <path class="dg-grey" d="M12 72H228"/>
+            <circle class="dg-point" cx="120" cy="32" r="4.5"/>
+          </svg>
+          <h3>Open circuit</h3>
+          <p>The conductor is broken. The pulse reflects back with the same polarity it was sent with.</p>
+          <p class="fault-type__tdr is-yes">Low-voltage TDR alone: visible</p>
+        </li>
+        <li class="fault-type plate">
+          <svg viewBox="0 0 240 96" role="img" aria-label="Sketch: a solid connection between the conductor and the screen.">
+            <path class="dg-line-2" d="M12 32H228M120 32V72"/>
+            <path class="dg-grey" d="M12 72H228"/>
+            <circle class="dg-point" cx="120" cy="52" r="4.5"/>
+          </svg>
+          <h3>Short circuit</h3>
+          <p>A low-resistance path from the conductor to the screen or another phase. The reflection comes back inverted.</p>
+          <p class="fault-type__tdr is-yes">Low-voltage TDR alone: visible</p>
+        </li>
+        <li class="fault-type plate">
+          <svg viewBox="0 0 240 96" role="img" aria-label="Sketch: a resistor between the conductor and the screen.">
+            <path class="dg-line-2" d="M12 32H228"/>
+            <path class="dg-line" d="M120 32V40L128 44L112 52L128 60L112 68L120 72"/>
+            <path class="dg-grey" d="M12 72H228"/>
+            <circle class="dg-point" cx="120" cy="56" r="4.5"/>
+          </svg>
+          <h3>High-resistance</h3>
+          <p>A leakage path of hundreds of ohms or more. It barely changes the cable&rsquo;s impedance, so a low-voltage pulse passes it by.</p>
+          <p class="fault-type__tdr">Low-voltage TDR alone: hidden, condition first</p>
+        </li>
+        <li class="fault-type plate">
+          <svg viewBox="0 0 240 96" role="img" aria-label="Sketch: a spark gap between the conductor and the screen.">
+            <path class="dg-line-2" d="M12 32H228M120 32V42M120 72V62"/>
+            <path class="dg-fill" d="M113 41H127L120 49ZM113 63H127L120 55Z"/>
+            <path class="dg-grey" d="M12 72H228"/>
+            <circle class="dg-point" cx="120" cy="52" r="2.5"/>
+          </svg>
+          <h3>Intermittent</h3>
+          <p>Holds at low voltage and flashes over only above a certain voltage, often only in service. Between flashovers it looks healthy.</p>
+          <p class="fault-type__tdr">Low-voltage TDR alone: hidden, condition first</p>
+        </li>
+      </ul>
+      <p class="fault-note">Rule of thumb: power cables have a characteristic impedance of roughly 10 to 50&nbsp;&Omega;. A shunt fault well below that reflects strongly. One many times higher, from about a kilohm upwards, reflects too little to see, which is why many faults in medium-voltage cables need step 2 before they can be measured.</p>
+    </div>
+  </section>
+
+  <!-- CABLE CROSS-SECTION -->
+  <section class="section section--white" id="cable" aria-labelledby="cable-title">
+    <div class="wrap xsec">
+      <div class="xsec__text">
+        <h2 id="cable-title">Inside a medium-voltage cable</h2>
+        <p>A test pulse does not run along the copper alone. It travels between the conductor and the metallic screen, guided through the insulation. So the insulation sets its speed, and every measurement starts with knowing the cable.</p>
+        <dl class="layers">
+          <div><dt>Conductor</dt><dd>Stranded copper or aluminium. Carries the load current and the test pulse.</dd></div>
+          <div><dt>Conductor screen</dt><dd>Semiconductive layer that smooths the electric field at the strands.</dd></div>
+          <div><dt>XLPE insulation</dt><dd>Holds the voltage. Its permittivity sets how fast the pulse travels.</dd></div>
+          <div><dt>Insulation screen</dt><dd>Semiconductive layer that keeps the field inside the insulation.</dd></div>
+          <div><dt>Metallic screen</dt><dd>Copper wires or tape, earthed. The return path for fault current and for the pulse.</dd></div>
+          <div><dt>Outer sheath</dt><dd>PE or PVC, often red. Keeps water out. A damaged sheath is a fault of its own.</dd></div>
+        </dl>
+        <div class="velocity">
+          <p><b>Velocity of propagation.</b> In XLPE cables the pulse travels at about <span class="nowrap">160 m/&micro;s</span>, a little over half the speed of light. Reflectometers use half that figure, <b>v/2</b>, because the pulse goes out and back.</p>
+          <p>A typical v/2 for XLPE is <b class="nowrap">80 m/&micro;s</b>; paper-insulated cables are usually a little slower. Confirm the value on a healthy phase or a known length before you trust a distance.</p>
+        </div>
+      </div>
+      <figure class="xsec__fig plate">
+        <svg class="diagram dg-wide" viewBox="0 0 520 340" role="img" aria-labelledby="xs-title xs-desc">
+          <title id="xs-title">Cross-section of a single-core XLPE medium-voltage cable</title>
+          <desc id="xs-desc">From the centre outwards: a stranded copper conductor, a thin black conductor screen, a thick milky-white XLPE insulation, a black insulation screen, a ring of copper screen wires on a bedding tape, and a red outer sheath.</desc>
+          <circle class="xs-sheath" cx="150" cy="170" r="140"/>
+          <circle class="xs-bed" cx="150" cy="170" r="128"/>
+          <g class="xs-copper-wire"><circle cx="272.0" cy="170.0" r="3.4"/><circle cx="271.1" cy="184.7" r="3.4"/><circle cx="268.5" cy="199.2" r="3.4"/><circle cx="264.1" cy="213.3" r="3.4"/><circle cx="258.0" cy="226.7" r="3.4"/><circle cx="250.4" cy="239.3" r="3.4"/><circle cx="241.3" cy="250.9" r="3.4"/><circle cx="230.9" cy="261.3" r="3.4"/><circle cx="219.3" cy="270.4" r="3.4"/><circle cx="206.7" cy="278.0" r="3.4"/><circle cx="193.3" cy="284.1" r="3.4"/><circle cx="179.2" cy="288.5" r="3.4"/><circle cx="164.7" cy="291.1" r="3.4"/><circle cx="150.0" cy="292.0" r="3.4"/><circle cx="135.3" cy="291.1" r="3.4"/><circle cx="120.8" cy="288.5" r="3.4"/><circle cx="106.7" cy="284.1" r="3.4"/><circle cx="93.3" cy="278.0" r="3.4"/><circle cx="80.7" cy="270.4" r="3.4"/><circle cx="69.1" cy="261.3" r="3.4"/><circle cx="58.7" cy="250.9" r="3.4"/><circle cx="49.6" cy="239.3" r="3.4"/><circle cx="42.0" cy="226.7" r="3.4"/><circle cx="35.9" cy="213.3" r="3.4"/><circle cx="31.5" cy="199.2" r="3.4"/><circle cx="28.9" cy="184.7" r="3.4"/><circle cx="28.0" cy="170.0" r="3.4"/><circle cx="28.9" cy="155.3" r="3.4"/><circle cx="31.5" cy="140.8" r="3.4"/><circle cx="35.9" cy="126.7" r="3.4"/><circle cx="42.0" cy="113.3" r="3.4"/><circle cx="49.6" cy="100.7" r="3.4"/><circle cx="58.7" cy="89.1" r="3.4"/><circle cx="69.1" cy="78.7" r="3.4"/><circle cx="80.7" cy="69.6" r="3.4"/><circle cx="93.3" cy="62.0" r="3.4"/><circle cx="106.7" cy="55.9" r="3.4"/><circle cx="120.8" cy="51.5" r="3.4"/><circle cx="135.3" cy="48.9" r="3.4"/><circle cx="150.0" cy="48.0" r="3.4"/><circle cx="164.7" cy="48.9" r="3.4"/><circle cx="179.2" cy="51.5" r="3.4"/><circle cx="193.3" cy="55.9" r="3.4"/><circle cx="206.7" cy="62.0" r="3.4"/><circle cx="219.3" cy="69.6" r="3.4"/><circle cx="230.9" cy="78.7" r="3.4"/><circle cx="241.3" cy="89.1" r="3.4"/><circle cx="250.4" cy="100.7" r="3.4"/><circle cx="258.0" cy="113.3" r="3.4"/><circle cx="264.1" cy="126.7" r="3.4"/><circle cx="268.5" cy="140.8" r="3.4"/><circle cx="271.1" cy="155.3" r="3.4"/></g>
+          <circle class="xs-semicon" cx="150" cy="170" r="116"/>
+          <circle class="xs-xlpe" cx="150" cy="170" r="108"/>
+          <circle class="xs-semicon" cx="150" cy="170" r="56"/>
+          <g class="xs-copper"><circle cx="150.0" cy="170.0" r="9.7"/><circle cx="169.4" cy="170.0" r="9.7"/><circle cx="159.7" cy="186.8" r="9.7"/><circle cx="140.3" cy="186.8" r="9.7"/><circle cx="130.6" cy="170.0" r="9.7"/><circle cx="140.3" cy="153.2" r="9.7"/><circle cx="159.7" cy="153.2" r="9.7"/><circle cx="187.5" cy="180.0" r="9.7"/><circle cx="177.4" cy="197.4" r="9.7"/><circle cx="160.0" cy="207.5" r="9.7"/><circle cx="140.0" cy="207.5" r="9.7"/><circle cx="122.6" cy="197.4" r="9.7"/><circle cx="112.5" cy="180.0" r="9.7"/><circle cx="112.5" cy="160.0" r="9.7"/><circle cx="122.6" cy="142.6" r="9.7"/><circle cx="140.0" cy="132.5" r="9.7"/><circle cx="160.0" cy="132.5" r="9.7"/><circle cx="177.4" cy="142.6" r="9.7"/><circle cx="187.5" cy="160.0" r="9.7"/></g>
+          <path class="xs-lead" d="M212.9 51.7L322 35H332"/><circle class="xs-dot" cx="212.9" cy="51.7" r="3"/><text class="dg-label" x="338" y="40">Outer sheath</text>
+          <path class="xs-lead" d="M240.7 88.4L322 89H332"/><circle class="xs-dot" cx="240.7" cy="88.4" r="3"/><text class="dg-label" x="338" y="94">Metallic screen</text>
+          <path class="xs-lead" d="M255.2 131.7L322 143H332"/><circle class="xs-dot" cx="255.2" cy="131.7" r="3"/><text class="dg-label" x="338" y="148">Insulation screen</text>
+          <path class="xs-lead" d="M231.8 175.7L322 197H332"/><circle class="xs-dot" cx="231.8" cy="175.7" r="3"/><text class="dg-label" x="338" y="202">XLPE insulation</text>
+          <path class="xs-lead" d="M199.1 189.9L322 251H332"/><circle class="xs-dot" cx="199.1" cy="189.9" r="3"/><text class="dg-label" x="338" y="256">Conductor screen</text>
+          <path class="xs-lead" d="M170.5 186.0L322 305H332"/><circle class="xs-dot" cx="170.5" cy="186.0" r="3"/><text class="dg-label" x="338" y="310">Conductor</text>
+        </svg>
+                <svg class="diagram dg-narrow" viewBox="0 0 360 300" role="img" aria-labelledby="xs-title-n xs-desc">
+          <title id="xs-title-n">Cross-section of a single-core XLPE medium-voltage cable</title>
+          <circle class="xs-sheath" cx="96" cy="150" r="95"/><circle class="xs-bed" cx="96" cy="150" r="87"/>
+          <g class="xs-copper-wire"><circle cx="179.0" cy="150.0" r="2.4"/><circle cx="178.0" cy="163.0" r="2.4"/><circle cx="174.9" cy="175.6" r="2.4"/><circle cx="170.0" cy="187.7" r="2.4"/><circle cx="163.1" cy="198.8" r="2.4"/><circle cx="154.7" cy="208.7" r="2.4"/><circle cx="144.8" cy="217.1" r="2.4"/><circle cx="133.7" cy="224.0" r="2.4"/><circle cx="121.6" cy="228.9" r="2.4"/><circle cx="109.0" cy="232.0" r="2.4"/><circle cx="96.0" cy="233.0" r="2.4"/><circle cx="83.0" cy="232.0" r="2.4"/><circle cx="70.4" cy="228.9" r="2.4"/><circle cx="58.3" cy="224.0" r="2.4"/><circle cx="47.2" cy="217.1" r="2.4"/><circle cx="37.3" cy="208.7" r="2.4"/><circle cx="28.9" cy="198.8" r="2.4"/><circle cx="22.0" cy="187.7" r="2.4"/><circle cx="17.1" cy="175.6" r="2.4"/><circle cx="14.0" cy="163.0" r="2.4"/><circle cx="13.0" cy="150.0" r="2.4"/><circle cx="14.0" cy="137.0" r="2.4"/><circle cx="17.1" cy="124.4" r="2.4"/><circle cx="22.0" cy="112.3" r="2.4"/><circle cx="28.9" cy="101.2" r="2.4"/><circle cx="37.3" cy="91.3" r="2.4"/><circle cx="47.2" cy="82.9" r="2.4"/><circle cx="58.3" cy="76.0" r="2.4"/><circle cx="70.4" cy="71.1" r="2.4"/><circle cx="83.0" cy="68.0" r="2.4"/><circle cx="96.0" cy="67.0" r="2.4"/><circle cx="109.0" cy="68.0" r="2.4"/><circle cx="121.6" cy="71.1" r="2.4"/><circle cx="133.7" cy="76.0" r="2.4"/><circle cx="144.8" cy="82.9" r="2.4"/><circle cx="154.7" cy="91.3" r="2.4"/><circle cx="163.1" cy="101.2" r="2.4"/><circle cx="170.0" cy="112.3" r="2.4"/><circle cx="174.9" cy="124.4" r="2.4"/><circle cx="178.0" cy="137.0" r="2.4"/></g>
+          <circle class="xs-semicon" cx="96" cy="150" r="79"/><circle class="xs-xlpe" cx="96" cy="150" r="73.5"/><circle class="xs-semicon" cx="96" cy="150" r="38"/>
+          <g class="xs-copper"><circle cx="96.0" cy="150.0" r="6.6"/><circle cx="109.2" cy="150.0" r="6.6"/><circle cx="102.6" cy="161.4" r="6.6"/><circle cx="89.4" cy="161.4" r="6.6"/><circle cx="82.8" cy="150.0" r="6.6"/><circle cx="89.4" cy="138.6" r="6.6"/><circle cx="102.6" cy="138.6" r="6.6"/><circle cx="121.5" cy="156.8" r="6.6"/><circle cx="114.7" cy="168.7" r="6.6"/><circle cx="102.8" cy="175.5" r="6.6"/><circle cx="89.2" cy="175.5" r="6.6"/><circle cx="77.3" cy="168.7" r="6.6"/><circle cx="70.5" cy="156.8" r="6.6"/><circle cx="70.5" cy="143.2" r="6.6"/><circle cx="77.3" cy="131.3" r="6.6"/><circle cx="89.2" cy="124.5" r="6.6"/><circle cx="102.8" cy="124.5" r="6.6"/><circle cx="114.7" cy="131.3" r="6.6"/><circle cx="121.5" cy="143.2" r="6.6"/></g>
+          <path class="xs-lead" d="M138.7 69.7L198 25H202"/><circle class="xs-dot" cx="138.7" cy="69.7" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="30">Outer sheath</text><path class="xs-lead" d="M157.7 94.5L198 73H202"/><circle class="xs-dot" cx="157.7" cy="94.5" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="78">Metallic screen</text><path class="xs-lead" d="M167.4 124.0L198 121H202"/><circle class="xs-dot" cx="167.4" cy="124.0" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="126">Insulation screen</text><path class="xs-lead" d="M151.9 153.9L198 169H202"/><circle class="xs-dot" cx="151.9" cy="153.9" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="174">XLPE insulation</text><path class="xs-lead" d="M129.4 163.5L198 217H202"/><circle class="xs-dot" cx="129.4" cy="163.5" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="222">Conductor screen</text><path class="xs-lead" d="M110.2 161.1L198 265H202"/><circle class="xs-dot" cx="110.2" cy="161.1" r="2.5"/><text class="dg-label dg-label--sm" x="206" y="270">Conductor</text>
+        </svg>
+        <figcaption class="figure-caption">Single-core XLPE cable, schematic. Layer thicknesses are drawn for legibility, not to scale.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- THE FOUR STEPS -->
+  <section class="section" id="steps" aria-labelledby="steps-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="steps-title">Four steps, one sequence</h2>
+        <p class="lead">Each step hands a narrower search to the next. Skip one and the next is guessing.</p>
+      </div>
+
+      <ol class="method">
+
+        <!-- STEP 1 -->
+        <li class="method-step" id="step-1" aria-labelledby="step-1-title">
+          <span class="method-step__node" aria-hidden="true"></span>
+          <div class="method-step__head">
+            <span class="method-step__num" aria-hidden="true">1</span>
+            <h2 id="step-1-title"><span class="sr-only">Step 1: </span>Pre-locate: measure the distance</h2>
+          </div>
+          <div class="method-step__grid">
+            <div class="method-step__text">
+                <p>A time domain reflectometer (TDR) sends a short low-voltage pulse into the faulty phase and records what comes back. Wherever the cable&rsquo;s impedance changes, part of the pulse reflects: at joints, at the cable end, and at the fault.</p>
+                <p>The time to the start of the reflection, multiplied by v/2, is the distance. An open circuit reflects with the same polarity as the pulse; a short circuit reflects inverted. The further the fault, the smaller and wider its reflection, because the cable attenuates and spreads the pulse.</p>
+              </div>
+            <figure class="method-step__fig">
+              <div class="tdr-lab plate" data-tdr-lab>
+                <div class="tdr-lab__controls">
+                  <div class="field tdr-lab__slider">
+                    <label class="field__label" for="fault-pos"><span>Fault position</span> <output for="fault-pos" data-lab-pos>1,280 m</output></label>
+                    <input class="range" type="range" id="fault-pos" min="104" max="1896" step="8" value="1280" aria-valuetext="1,280 metres along the cable">
+                    <div class="range__scale" aria-hidden="true"><span>0 m</span><span>2,000 m</span></div>
+                  </div>
+                  <fieldset class="seg">
+                    <legend class="field__label">Fault type</legend>
+                    <div class="seg__opts">
+                      <label class="seg__opt"><input type="radio" name="lab-type" value="open" checked><span>Open</span></label>
+                      <label class="seg__opt"><input type="radio" name="lab-type" value="short"><span>Short</span></label>
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="tdr-lab__plot" data-lab-plot aria-hidden="true"></div>
+                <dl class="keyfigs keyfigs--3 tdr-lab__read">
+                  <div><dt>Reflection after</dt><dd><span data-lab-t>16.0</span><span class="unit">&micro;s</span></dd></div>
+                  <div><dt>v/2, XLPE, typical</dt><dd>80<span class="unit">m/&micro;s</span></dd></div>
+                  <div class="is-result"><dt>Distance to fault</dt><dd><span data-lab-d>1,280</span><span class="unit">m</span></dd></div>
+                </dl>
+                <p class="tdr-lab__formula" data-lab-formula aria-live="polite">80&nbsp;m/&micro;s &times; 16.0&nbsp;&micro;s = <b>1,280&nbsp;m</b> to an open circuit.</p>
+              </div>
+              <figcaption class="figure-caption">Move the fault along a 2,000&nbsp;m XLPE cable. Top: the cable, with the pulse going out (solid) and coming back (dashed). Below: the trace the TDR draws. The time axis and the distance axis are the same axis, scaled by v/2.</figcaption>
+            </figure>
+            <dl class="method-facts">
+                <div><dt>What you measure</dt><dd>Round-trip time to the reflection, converted to metres with the cable&rsquo;s v/2.</dd></div>
+                <div><dt>Typical pitfall</dt><dd>A wrong v/2. Five per cent off in velocity is five per cent off in distance: 64&nbsp;m on a 1,280&nbsp;m fault.</dd></div>
+                <div><dt>Instruments</dt><dd>
+                  <ul class="station__products">
+                    <li><a href="/products/tdr-901-time-domain-reflectometer"><span class="station__model">TDR-901</span> <span class="station__pname">Time domain reflectometer</span></a></li>
+                    <li><a href="/products/arm-filter"><span class="station__model">ARM Filter</span> <span class="station__pname">Arc reflection filter, used in step 2</span></a></li>
+                  </ul>
+                </dd></div>
+              </dl>
+          </div>
+        </li>
+
+        <!-- STEP 2 -->
+        <li class="method-step" id="step-2" aria-labelledby="step-2-title">
+          <span class="method-step__node" aria-hidden="true"></span>
+          <div class="method-step__head">
+            <span class="method-step__num" aria-hidden="true">2</span>
+            <h2 id="step-2-title"><span class="sr-only">Step 2: </span>Condition: make the fault visible</h2>
+          </div>
+          <div class="method-step__grid">
+            <div class="method-step__text">
+                <p>High-resistance and intermittent faults do not show on a low-voltage trace. A surge generator charges a capacitor to several kilovolts and discharges it into the cable. At the fault the voltage breaks down the weak insulation and an arc forms. While it burns, the arc is close to a short circuit, so for a few milliseconds the fault reflects.</p>
+                <p>With the arc reflection method (ARM), a filter couples the TDR to the cable and keeps the high voltage away from it. The TDR records one trace before the surge and one during the arc. Where the two traces part is the fault. When the arc is too short to catch, or on long cables, the impulse current method (ICM) reads the current transients of the discharge instead.</p>
+              </div>
+            <figure class="method-step__fig">
+              <div class="plate">
+                <svg class="diagram dg-wide" viewBox="0 0 520 330" role="img" aria-labelledby="arm-title arm-desc">
+                  <title id="arm-title">Arc reflection method</title>
+                  <desc id="arm-desc">Top: a surge generator feeds the cable through an ARM filter, with the TDR connected to the filter; an arc burns at the fault. Bottom: two TDR traces. The reference trace, taken before the surge, runs flat to the cable end. The trace taken during the arc dips down at the fault. The point where they part marks the fault distance.</desc>
+                  <!-- circuit -->
+                  <rect class="dg-fill" x="8" y="16" width="92" height="36" rx="2"/>
+                  <text class="dg-box-text" x="54" y="39" text-anchor="middle">PG-32</text>
+                  <path class="dg-line" d="M100 34H128"/>
+                  <rect class="dg-fill-white" x="128" y="16" width="112" height="36" rx="2"/>
+                  <text class="dg-label dg-label--sm" x="184" y="39" text-anchor="middle">ARM Filter</text>
+                  <rect class="dg-fill" x="8" y="72" width="92" height="36" rx="2"/>
+                  <text class="dg-box-text" x="54" y="95" text-anchor="middle">TDR-901</text>
+                  <path class="dg-line" d="M100 90H184V52"/>
+                  <path class="dg-line-2" d="M240 34H508"/>
+                  <path class="dg-grey" d="M240 52H508"/>
+                  <text class="dg-text dg-text--sm" x="250" y="24">Cable under test</text>
+                  <path class="dg-hot" d="M392 34L386 39L397 43L387 48L393 52"/>
+                  <text class="dg-text" x="392" y="76" text-anchor="middle">Arc at the fault</text>
+                  <!-- traces -->
+                  <path class="dg-dash" d="M20 136H48"/>
+                  <text class="dg-text dg-text--sm" x="56" y="141">Before the surge: reference</text>
+                  <path class="dg-line-2" d="M268 136H296"/>
+                  <text class="dg-text dg-text--sm" x="304" y="141">During the arc</text>
+                  <path class="dg-dash" d="M20 210H24C28 210 29 168 33 168S39 214 45 213L49 210H470C474 210 476 180 480 178S490 200 500 205L508 208"/>
+                  <path class="dg-line-2" d="M20 210H24C28 210 29 168 33 168S39 214 45 213L49 210H392C396 210 398 262 404 262S414 228 424 222S444 214 460 213H508"/>
+                  <path class="dg-hot-dash" d="M392 172V296"/>
+                  <circle class="dg-point" cx="392" cy="210" r="5"/>
+                  <text class="dg-hot-text" x="384" y="186" text-anchor="end">Traces part here</text>
+                  <path class="dg-thin" d="M20 296H508"/>
+                  <path class="dg-grey" d="M20 296V302M392 296V302M480 296V302"/>
+                  <text class="dg-text" x="20" y="320">0 m</text>
+                  <text class="dg-hot-text" x="392" y="320" text-anchor="middle">Fault</text>
+                  <text class="dg-text" x="480" y="320" text-anchor="middle">Cable end</text>
+                </svg>
+                <svg class="diagram dg-narrow" viewBox="0 0 360 330" role="img" aria-labelledby="arm-title-n arm-desc">
+                  <title id="arm-title-n">Arc reflection method</title>
+                  <rect class="dg-fill" x="4" y="12" width="82" height="32" rx="2"/>
+                  <text class="dg-box-text" x="45" y="33" text-anchor="middle">PG-32</text>
+                  <path class="dg-line" d="M86 28H100"/>
+                  <rect class="dg-fill-white" x="100" y="12" width="92" height="32" rx="2"/>
+                  <text class="dg-label dg-label--sm" x="146" y="33" text-anchor="middle">ARM Filter</text>
+                  <rect class="dg-fill" x="4" y="60" width="82" height="32" rx="2"/>
+                  <text class="dg-box-text" x="45" y="81" text-anchor="middle">TDR-901</text>
+                  <path class="dg-line" d="M86 76H146V44"/>
+                  <path class="dg-line-2" d="M192 28H356"/>
+                  <path class="dg-grey" d="M192 44H356"/>
+                  <path class="dg-hot" d="M290 28L285 32L294 36L286 40L291 44"/>
+                  <text class="dg-text" x="290" y="66" text-anchor="middle">Arc at the fault</text>
+                  <path class="dg-dash" d="M8 114H28"/>
+                  <text class="dg-text dg-text--sm" x="34" y="119">Reference, before the surge</text>
+                  <path class="dg-line-2" d="M8 138H28"/>
+                  <text class="dg-text dg-text--sm" x="34" y="143">During the arc</text>
+                  <path class="dg-dash" d="M8 210H12C15 210 16 172 19 172S24 214 29 213L32 210H312C315 210 317 182 320 180S328 200 336 205L352 208"/>
+                  <path class="dg-line-2" d="M8 210H12C15 210 16 172 19 172S24 214 29 213L32 210H230C233 210 235 258 240 258S248 228 256 222S272 214 286 213H352"/>
+                  <path class="dg-hot-dash" d="M230 168V292"/>
+                  <circle class="dg-point" cx="230" cy="210" r="5"/>
+                  <text class="dg-hot-text" x="222" y="184" text-anchor="end">Traces part here</text>
+                  <path class="dg-thin" d="M8 292H352"/>
+                  <path class="dg-grey" d="M8 292V298M230 292V298M320 292V298"/>
+                  <text class="dg-text" x="8" y="316">0 m</text>
+                  <text class="dg-hot-text" x="230" y="316" text-anchor="middle">Fault</text>
+                  <text class="dg-text" x="320" y="316" text-anchor="middle">Cable end</text>
+                </svg>
+              </div>
+              <figcaption class="figure-caption">The reference shows only the cable end: the high-resistance fault is invisible to it. During the arc the fault behaves like a short and reflects inverted.</figcaption>
+            </figure>
+            <dl class="method-facts">
+                <div><dt>What you measure</dt><dd>The distance at which the arc trace departs from the reference trace.</dd></div>
+                <div><dt>Typical pitfall</dt><dd>Surging higher than the fault needs. Raise the voltage in steps, and stay within the test voltage allowed for the cable.</dd></div>
+                <div><dt>Instruments</dt><dd>
+                  <ul class="station__products">
+                    <li><a href="/products/pg-10-surge-generator"><span class="station__model">PG-10</span> <span class="station__pname">Surge generator, 10 kV</span></a></li>
+                    <li><a href="/products/pg-32-surge-generator"><span class="station__model">PG-32</span> <span class="station__pname">Surge generator, 30 kV</span></a></li>
+                    <li><a href="/products/arm-filter"><span class="station__model">ARM Filter</span> <span class="station__pname">with the TDR-901, for arc reflection</span></a></li>
+                  </ul>
+                </dd></div>
+              </dl>
+          </div>
+        </li>
+
+        <!-- STEP 3 -->
+        <li class="method-step" id="step-3" aria-labelledby="step-3-title">
+          <span class="method-step__node" aria-hidden="true"></span>
+          <div class="method-step__head">
+            <span class="method-step__num" aria-hidden="true">3</span>
+            <h2 id="step-3-title"><span class="sr-only">Step 3: </span>Pinpoint: find the spot to dig</h2>
+          </div>
+          <div class="method-step__grid">
+            <div class="method-step__text">
+                <p>A pre-located distance still carries the uncertainty of v/2 and of the route, often several metres. Digging needs the exact spot.</p>
+                <p>With the surge generator firing at a steady rate, every discharge makes a sharp thump at the fault, and the sound travels up through the soil. Walk the traced route around the pre-located distance with a ground microphone. The thump is loudest directly above the fault and fades on either side.</p>
+                <p>Compare loudness, not just presence: on hard surfaces and along ducts the sound can carry several metres.</p>
+              </div>
+            <figure class="method-step__fig">
+              <div class="plate">
+                <svg class="diagram dg-wide" viewBox="0 0 520 320" role="img" aria-labelledby="ac-title ac-desc">
+                  <title id="ac-title">Acoustic pinpointing</title>
+                  <desc id="ac-desc">A cable is buried about one metre deep. Sound waves rise from the discharge at the fault to the surface. Bars above the ground show the loudness heard at ten stops along the route: the bar directly above the fault is the tallest, and the bars fall away on both sides.</desc>
+                  <text class="dg-text dg-text--sm" x="16" y="24">Loudness at each stop</text>
+                  <rect class="dg-fill" x="32" y="110.3" width="16" height="17.7"/><rect class="dg-fill" x="80" y="106.2" width="16" height="21.8"/><rect class="dg-fill" x="128" y="99.5" width="16" height="28.5"/><rect class="dg-fill" x="176" y="87.8" width="16" height="40.2"/><rect class="dg-fill" x="224" y="64.4" width="16" height="63.6"/><rect class="dg-point" x="272" y="38.0" width="16" height="90.0"/><rect class="dg-fill" x="320" y="64.4" width="16" height="63.6"/><rect class="dg-fill" x="368" y="87.8" width="16" height="40.2"/><rect class="dg-fill" x="416" y="99.5" width="16" height="28.5"/><rect class="dg-fill" x="464" y="106.2" width="16" height="21.8"/>
+                  <text class="dg-hot-text" x="296" y="30">Loudest: dig here</text>
+                  <path class="dg-thin" d="M16 158l-8 8M40 158l-8 8M64 158l-8 8M88 158l-8 8M112 158l-8 8M136 158l-8 8M160 158l-8 8M184 158l-8 8M208 158l-8 8M232 158l-8 8M328 158l-8 8M352 158l-8 8M376 158l-8 8M400 158l-8 8M424 158l-8 8M448 158l-8 8M496 158l-8 8M520 158l-8 8"/>
+                  <path class="dg-line" d="M8 150H512"/>
+                  <path class="dg-fill-white" d="M34 150L40 141L46 150ZM82 150L88 141L94 150ZM130 150L136 141L142 150ZM178 150L184 141L190 150ZM226 150L232 141L238 150ZM274 150L280 141L286 150ZM322 150L328 141L334 150ZM370 150L376 141L382 150ZM418 150L424 141L430 150ZM466 150L472 141L478 150Z"/>
+                  <path class="dg-line" d="M266 198A14 14 0 0 1 294 198M252 198A28 28 0 0 1 308 198"/>
+                  <path class="dg-grey" d="M238 198A42 42 0 0 1 322 198"/>
+                  <path class="dg-line-2" d="M8 198H512"/>
+                  <circle class="dg-point" cx="280" cy="198" r="5.5"/>
+                  <text class="dg-text" x="280" y="226" text-anchor="middle">Discharge at the fault</text>
+                  <path class="dg-grey" d="M478 150V198M472 150H484M472 198H484"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="468" y="179" text-anchor="end">about 1 m</text>
+                  <path class="dg-thin" d="M40 262H472"/>
+                  <path class="dg-grey" d="M40 262V267M88 262V267M136 262V267M184 262V267M232 262V267M280 262V270M328 262V267M376 262V267M424 262V267M472 262V267"/>
+                  <text class="dg-text" x="88" y="288" text-anchor="middle">&minus;4 m</text>
+                  <text class="dg-text" x="184" y="288" text-anchor="middle">&minus;2 m</text>
+                  <text class="dg-hot-text" x="280" y="288" text-anchor="middle">0</text>
+                  <text class="dg-text" x="376" y="288" text-anchor="middle">+2 m</text>
+                  <text class="dg-text" x="472" y="288" text-anchor="middle">+4 m</text>
+                  <text class="dg-text dg-text--sm" x="40" y="312">Distance along the route from the loudest point</text>
+                </svg>
+                <svg class="diagram dg-narrow" viewBox="0 0 360 300" role="img" aria-labelledby="ac-title-n ac-desc">
+                  <title id="ac-title-n">Acoustic pinpointing</title>
+                  <text class="dg-text dg-text--sm" x="12" y="22">Loudness at each stop</text>
+                  <rect class="dg-fill" x="22" y="99.5" width="16" height="28.5"/><rect class="dg-fill" x="72" y="87.8" width="16" height="40.2"/><rect class="dg-fill" x="122" y="64.4" width="16" height="63.6"/><rect class="dg-point" x="172" y="38.0" width="16" height="90.0"/><rect class="dg-fill" x="222" y="64.4" width="16" height="63.6"/><rect class="dg-fill" x="272" y="87.8" width="16" height="40.2"/><rect class="dg-fill" x="322" y="99.5" width="16" height="28.5"/>
+                  <text class="dg-hot-text" x="194" y="30">Loudest: dig here</text>
+                  <path class="dg-thin" d="M14 158l-8 8M38 158l-8 8M62 158l-8 8M86 158l-8 8M110 158l-8 8M134 158l-8 8M230 158l-8 8M254 158l-8 8M278 158l-8 8M302 158l-8 8M326 158l-8 8M350 158l-8 8"/>
+                  <path class="dg-line" d="M6 150H354"/>
+                  <path class="dg-fill-white" d="M24 150L30 141L36 150ZM74 150L80 141L86 150ZM124 150L130 141L136 150ZM174 150L180 141L186 150ZM224 150L230 141L236 150ZM274 150L280 141L286 150ZM324 150L330 141L336 150Z"/>
+                  <path class="dg-line" d="M166 198A14 14 0 0 1 194 198M152 198A28 28 0 0 1 208 198"/>
+                  <path class="dg-grey" d="M138 198A42 42 0 0 1 222 198"/>
+                  <path class="dg-line-2" d="M6 198H354"/>
+                  <circle class="dg-point" cx="180" cy="198" r="5.5"/>
+                  <text class="dg-text" x="180" y="226" text-anchor="middle">Discharge at the fault</text>
+                  <path class="dg-grey" d="M334 150V198M328 150H340M328 198H340"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="326" y="179" text-anchor="end">about 1 m</text>
+                  <path class="dg-thin" d="M30 262H330"/>
+                  <path class="dg-grey" d="M30 262V267M80 262V267M130 262V267M180 262V270M230 262V267M280 262V267M330 262V267"/>
+                  <text class="dg-text" x="80" y="288" text-anchor="middle">&minus;2 m</text>
+                  <text class="dg-hot-text" x="180" y="288" text-anchor="middle">0</text>
+                  <text class="dg-text" x="280" y="288" text-anchor="middle">+2 m</text>
+                </svg>
+              </div>
+              <figcaption class="figure-caption">Bar heights follow 1/r for a fault 1&nbsp;m deep, ignoring soil damping: a metre off the spot the thump is already about 30% quieter.</figcaption>
+            </figure>
+            <dl class="method-facts">
+                <div><dt>What you measure</dt><dd>The loudness of each discharge at stops along the route. The maximum marks the fault.</dd></div>
+                <div><dt>Typical pitfall</dt><dd>Listening while walking. Footsteps and traffic mask the thump: stand still for each shot.</dd></div>
+                <div><dt>Instruments</dt><dd>
+                  <ul class="station__products">
+                    <li><a href="/products/ap-01-acoustic-pinpointer"><span class="station__model">AP-01</span> <span class="station__pname">Acoustic pinpointer, 80&ndash;1500 Hz, four filters</span></a></li>
+                    <li><a href="/products/pg-32-surge-generator"><span class="station__model">PG-32</span> <span class="station__pname">fires automatically every 5 s</span></a></li>
+                  </ul>
+                </dd></div>
+              </dl>
+          </div>
+        </li>
+
+        <!-- STEP 4 -->
+        <li class="method-step" id="step-4" aria-labelledby="step-4-title">
+          <span class="method-step__node" aria-hidden="true"></span>
+          <div class="method-step__head">
+            <span class="method-step__num" aria-hidden="true">4</span>
+            <h2 id="step-4-title"><span class="sr-only">Step 4: </span>Trace route: put the distance on the map</h2>
+          </div>
+          <div class="method-step__grid">
+            <div class="method-step__text">
+                <p>The TDR measures along the cable, not across the street. A cable that turns a corner can be 1,280&nbsp;m away along its length and well under 1,000&nbsp;m away in a straight line. Without the route, the pinpointer walks the wrong line.</p>
+                <p>A transmitter puts an audio-frequency signal on the cable. A hand-held receiver picks up the magnetic field above it and follows the cable along the street, corner by corner. Pace the distance along the traced path, and allow for slack at joints and terminations.</p>
+                <p>In practice you trace before you walk with the pinpointer. It comes last here because it turns a distance into an address.</p>
+              </div>
+            <figure class="method-step__fig">
+              <div class="plate">
+                <svg class="diagram dg-wide" viewBox="0 0 520 360" role="img" aria-labelledby="rt-title rt-desc">
+                  <title id="rt-title">Route tracing over a street plan</title>
+                  <desc id="rt-desc">A street plan seen from above. The traced cable leaves a substation, runs east along one street and turns south down another. The fault lies 1,280 metres along the cable, but only about 952 metres from the substation in a straight line.</desc>
+                  <path class="dg-thin" d="M10 10h100v30H10zM120 10h100v30H120zM260 10h120v30H260zM390 10h120v30H390zM10 80h100v70H10zM120 80h100v70H120zM10 160h100v80H10zM120 160h100v80H120zM260 80h120v70H260zM390 80h120v70H390zM260 160h120v80H260zM390 160h120v80H390zM10 280h100v50H10zM120 280h100v50H120zM260 280h120v50H260zM390 280h120v50H390z"/>
+                  <path class="dg-dash" d="M28 60L240 168"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="134" y="108" text-anchor="middle" transform="rotate(27 134 108)">952 m in a straight line</text>
+                  <path class="dg-line-2" d="M28 60H240V260H512"/>
+                  <path class="dg-line" d="M90.5 54V66M153 54V66M215.5 54V66M234 98H246M234 160.5H246"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="153" y="34" text-anchor="middle">500 m</text>
+                  <text class="dg-text dg-text--sm dg-halo" x="256" y="103">1,000 m</text>
+                  <rect class="dg-fill" x="18" y="50" width="20" height="20"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="18" y="31">Substation</text>
+                  <circle class="dg-ring" cx="240" cy="168" r="11"/>
+                  <circle class="dg-point" cx="240" cy="168" r="5.5"/>
+                  <text class="dg-hot-text dg-halo" x="260" y="173">1,280 m along the cable</text>
+                  <text class="dg-text dg-text--sm dg-halo" x="300" y="252">Traced cable route</text>
+                  <path class="dg-grey" d="M392 350H442M392 345V355M442 345V355"/>
+                  <text class="dg-text dg-text--sm" x="450" y="355">200 m</text>
+                </svg>
+                <svg class="diagram dg-narrow" viewBox="0 0 360 330" role="img" aria-labelledby="rt-title-n rt-desc">
+                  <title id="rt-title-n">Route tracing over a street plan</title>
+                  <path class="dg-thin" d="M8 8h66v28H8zM84 8h66v28H84zM190 8h76v28h-76zM276 8h76v28h-76zM8 76h66v64H8zM84 76h66v64H84zM8 150h66v64H8zM84 150h66v64H84zM190 76h76v64h-76zM276 76h76v64h-76zM190 150h76v64h-76zM276 150h76v64h-76zM8 260h66v50H8zM84 260h66v50H84zM190 260h76v50h-76zM276 260h76v50h-76z"/>
+                  <path class="dg-dash" d="M20 56L170 132.4"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="110.0" y="95.8" text-anchor="middle" transform="rotate(27.0 110.0 95.8)">952 m in a straight line</text>
+                  <path class="dg-line-2" d="M20 56H170V240H356"/>
+                  <path class="dg-line" d="M64.2 50V62M108.4 50V62M152.7 50V62M164 82.9H176M164 127.1H176"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="108.4" y="30" text-anchor="middle">500 m</text>
+                  <text class="dg-text dg-text--sm dg-halo" x="184" y="87.9">1,000 m</text>
+                  <rect class="dg-fill" x="10" y="46" width="20" height="20"/>
+                  <text class="dg-text dg-text--sm dg-halo" x="12" y="28">Substation</text>
+                  <circle class="dg-ring" cx="170" cy="132.4" r="10"/>
+                  <circle class="dg-point" cx="170" cy="132.4" r="5"/>
+                  <text class="dg-hot-text dg-text--sm dg-halo" x="186" y="137.4">1,280 m along the cable</text>
+                  <text class="dg-text dg-text--sm dg-halo" x="200" y="234">Traced cable route</text>
+                  <path class="dg-grey" d="M262 322H297.4M262 317V327M297.4 317V327"/>
+                  <text class="dg-text dg-text--sm" x="305.4" y="327">200 m</text>
+                </svg>
+              </div>
+              <figcaption class="figure-caption">Same fault, two distances. Only the one along the traced route leads to the spot the pinpointer is listening for.</figcaption>
+            </figure>
+            <dl class="method-facts">
+                <div><dt>What you measure</dt><dd>The cable&rsquo;s path at the surface, and on most receivers its depth.</dd></div>
+                <div><dt>Typical pitfall</dt><dd>Pacing the distance in a straight line, or along the kerb instead of above the cable.</dd></div>
+                <div><dt>Instruments</dt><dd>
+                  <ul class="station__products">
+                    <li><a href="/products/crt-015-cable-route-tracer"><span class="station__model">CRT-015</span> <span class="station__pname">Cable route tracer</span></a></li>
+                  </ul>
+                </dd></div>
+              </dl>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- THE VAN -->
+  <section class="section section--white" aria-labelledby="van-title">
+    <div class="wrap chain-van">
+      <figure class="chain-van__photo">
+        <div class="plate">
+          <Picture
+            src={vanInterior}
+            formats={['avif', 'webp']}
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 900px) 58vw, 100vw"
+            loading="lazy"
+            decoding="async"
+            alt="Inside the cable test van: an instrument bench with a surge set and two orange instrument cases, a control panel with meters, a UPS, and a pull-out drawer holding a hand-held receiver and headphones."
+          />
+        </div>
+      </figure>
+      <div class="chain-van__copy">
+        <h2 id="van-title">Put the whole chain in one vehicle.</h2>
+        <p>The cable test van carries every step, fitted and wired: a reflectometer, a surge generator, an acoustic receiver and a route tracer, with the high-voltage connections at the rear doors. The crew arrives ready to measure.</p>
+        <div class="btn-row">
+          <Button variant="secondary" href="/cable-test-van">About the cable test van</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE BAND -->
+  <QuoteBand
+    heading="Price the chain for your network."
+    lead="Tell us the cable voltage and length, and the faults you see most. We recommend the kit and quote it."
+  >
+    <div class="btn-row" slot="actions">
+      <Button href="/request-a-quote">Request a quote</Button>
+      <Button variant="secondary" href="/products">Browse products</Button>
+    </div>
+  </QuoteBand>
+</BaseLayout>
+
+<script>
+  import '../scripts/method';
+</script>

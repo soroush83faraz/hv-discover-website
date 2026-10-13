@@ -1,0 +1,12 @@
+---
+/**
+ * The product catalog for the client-side quote list (src/scripts/quote.ts), built at
+ * build time from the products collection: <script type="application/json" id="quote-catalog">.
+ * Used by /request-a-quote and /quote-sent.
+ */
+import { getQuoteCatalog } from '../lib/products';
+
+// "<" escaped so a name can never close the script element.
+const json = JSON.stringify(await getQuoteCatalog()).replace(/</g, '\\u003c');
+---
+<script type="application/json" id="quote-catalog" is:inline set:html={json} />

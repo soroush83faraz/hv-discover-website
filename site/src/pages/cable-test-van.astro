@@ -1,0 +1,311 @@
+---
+/**
+ * /cable-test-van: port of design/mockups/cable-test-van.html.
+ * Hero, what's on board (stations with one function tile each: the equipment is named by
+ * function, its model is a slot until confirmed), inside the cabin (numbered callouts on
+ * the interior photo, linked to the legend by hover and focus), the rear doors, photos (the
+ * product Gallery with all van images), how a call-out works, specifications, FAQ and the
+ * contact band.
+ * The van is a showcase, not quotable (src/data/quotable.ts): its calls to action go to
+ * /contact, never to the quote list.
+ * Van data (lede, key figures, photos, specs, contact band) comes from
+ * src/content/products/cable-test-van.md; behaviour from src/scripts/catalog.ts.
+ */
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import KeyFigures from '../components/KeyFigures.astro';
+import SpecTable from '../components/SpecTable.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import Button from '../components/Button.astro';
+import Slot from '../components/Slot.astro';
+import FamilyDiagram from '../components/FamilyDiagram.astro';
+import Gallery from '../components/Gallery.astro';
+import { WORKFLOW_STEPS } from '../data/families';
+import { askHref, getProduct } from '../lib/products';
+import { breadcrumbList, productTitle, showcaseJsonLd } from '../lib/jsonld';
+import { SITE } from '../data/site';
+import '../styles/pages-a.css';
+
+const van = await getProduct('cable-test-van');
+const d = van.data;
+/** A van photo by file name: the hero, the cabin callouts and the rear doors each use a fixed one. */
+const photo = (name: string) => {
+  const img = d.images.find((i) => i.src.src.includes(`/${name}.`));
+  if (!img) throw new Error(`cable-test-van.md needs the image ${name}.jpg`);
+  return img;
+};
+const exterior = photo('van-exterior');
+const interior = photo('van-interior');
+const rear = photo('van-rear');
+const band = d.contactBand;
+if (!band) throw new Error('cable-test-van.md needs contactBand');
+
+/** What each step's instruments do once the van is parked. */
+const IN_THE_VAN: Record<number, string> = {
+  1: 'takes the first shot from the bench, and the arc reflection shot once the surge is running.',
+  2: 'charges the cable through the rear connection panel and keeps firing on its timer while the crew walks.',
+  3: 'leaves with the crew. They walk the route with the ground sensor and listen for each surge.',
+  4: 'marks the cable route at the surface, so the distance is walked along the real path.',
+};
+/**
+ * What the photos show for each step, by function. The fitted models are not confirmed, so no
+ * product is named or linked here: each model is a slot until the owner confirms it.
+ */
+const ON_BOARD: Record<number, { name: string; note?: string; slot: string }> = {
+  1: { name: 'Reflectometer', slot: 'reflectometer model' },
+  2: { name: 'Surge generator', note: 'With the HV connection panel at the rear doors.', slot: 'surge generator model' },
+  3: { name: 'Acoustic receiver', note: 'With headphones.', slot: 'acoustic receiver model' },
+  4: { name: 'Route tracer', note: 'Transmitter and receiver.', slot: 'route tracer model' },
+};
+const stations = WORKFLOW_STEPS.map((f) => ({ ...f, equipment: ON_BOARD[f.step as number] }));
+
+const jsonLd = [
+  await showcaseJsonLd(van),
+  breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: d.model, path: '/cable-test-van' },
+  ]),
+];
+---
+<BaseLayout
+  title={`${productTitle(van)} | ${SITE.name}`}
+  description={d.seo?.description ?? d.description}
+  ogImage={exterior.src}
+  ogImageAlt={exterior.alt}
+  jsonLd={jsonLd}
+>
+  <section class="van-hero" aria-labelledby="van-title">
+    <div class="wrap">
+      <p class="family-line">Integrated system: steps 1 to 4</p>
+      <h1 id="van-title">The whole fault-location chain, in one van.</h1>
+      <div class="van-hero__grid">
+        <figure class="van-hero__photo plate">
+          <Picture
+            src={exterior.src}
+            formats={['avif', 'webp']}
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 1024px) 62vw, 100vw"
+            alt={exterior.alt}
+            loading="eager"
+            fetchpriority="high"
+          />
+        </figure>
+        <div class="van-hero__info">
+          <p class="van-hero__name"><span class="nameplate">{d.model}</span> <span class="product-name">{d.name}</span></p>
+          <p class="product-lede">{d.description}</p>
+          <KeyFigures product={van} />
+          <div class="btn-row">
+            <Button href="/contact">Talk to us about the van</Button>
+            <Button variant="secondary" href="#on-board">See what’s on board</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section onboard" id="on-board" aria-labelledby="onboard-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="onboard-title">What’s on board</h2>
+        <p class="lead">One instrument set for each step of the sequence, and what each one does once the van is parked.</p>
+      </div>
+      <ol class="stations">
+        {
+          stations.map((f) => (
+            <li class="station">
+              <span class="station__node" aria-hidden="true" />
+              <span class="station__num" aria-hidden="true">{f.step}</span>
+              <h3><span class="sr-only">{`Step ${f.step}: `}</span>{f.verb}</h3>
+              <div class="mini-tiles">
+                <div class="mini-tile mini-tile--function">
+                  <div class="mini-tile__media" aria-hidden="true">
+                    <FamilyDiagram step={f.step} />
+                  </div>
+                  <div>
+                    <p class="mini-tile__model">{f.equipment.name}</p>
+                    <p class="mini-tile__name">{f.equipment.note && <>{f.equipment.note}{' '}</>}Model: <Slot text={f.equipment.slot} /></p>
+                  </div>
+                </div>
+              </div>
+              <p class="station__text"><b>In the van:</b> {IN_THE_VAN[f.step as number]}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="onboard__cabin"><b>Also on board:</b> a control panel with meters and status lamps and a UPS in the cabin, and at the rear doors the high-voltage connection panel and four cable reels.</p>
+    </div>
+  </section>
+
+  <section class="section section--white" aria-labelledby="inside-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="inside-title">Inside the cabin</h2>
+        <p class="lead">The working side of the van: instruments on the bench, the control panel beside them, the UPS below.</p>
+      </div>
+      <div class="callouts" data-callouts>
+        <figure class="callouts__figure">
+          <div class="callouts__stage plate">
+            <Picture
+              src={interior.src}
+              formats={['avif', 'webp']}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 1024px) 62vw, 100vw"
+              alt={interior.alt}
+              loading="lazy"
+              decoding="async"
+            />
+            {[1, 2, 3, 4, 5, 6].map((n) => <span class="marker" data-callout={n} aria-hidden="true">{n}</span>)}
+          </div>
+          <figcaption class="figure-caption">Numbers on the photo match the list.</figcaption>
+        </figure>
+        <div class="callouts__legend">
+          <ol class="legend">
+            <li data-callout="1" tabindex="0"><span class="legend__num" aria-hidden="true">1</span><span><span class="sr-only">1. </span><b>Instrument in an aluminium case</b> <span class="legend__what">HV Discover label, two digital displays and a high-voltage lead. <Slot text="model to confirm" /></span></span></li>
+            <li data-callout="2" tabindex="0"><span class="legend__num" aria-hidden="true">2</span><span><span class="sr-only">2. </span><b>Route-tracing transmitter</b> <span class="legend__what">In an orange hard case. <Slot text="model to confirm" /></span></span></li>
+            <li data-callout="3" tabindex="0"><span class="legend__num" aria-hidden="true">3</span><span><span class="sr-only">3. </span><b>Reflectometer</b> <span class="legend__what">Step 1, in an orange hard case on the bench, ready for the first shot. <Slot text="model to confirm" /></span></span></li>
+            <li data-callout="4" tabindex="0"><span class="legend__num" aria-hidden="true">4</span><span><span class="sr-only">4. </span><b>Control panel</b> <span class="legend__what">Two meters, status lamps for main, standby, surge, ARM, BT and 80 kV, a red push button and selector switches.</span></span></li>
+            <li data-callout="5" tabindex="0"><span class="legend__num" aria-hidden="true">5</span><span><span class="sr-only">5. </span><b>UPS</b> <span class="legend__what">Under the control panel.</span></span></li>
+            <li data-callout="6" tabindex="0"><span class="legend__num" aria-hidden="true">6</span><span><span class="sr-only">6. </span><b>Pull-out drawer</b> <span class="legend__what">A hand-held receiver and headphones.</span></span></li>
+          </ol>
+          <p class="legend__note">Items 1 to 3 are identified from the photo only.</p>
+        </div>
+      </div>
+
+      <div class="rear">
+        <div class="rear__head">
+          <h3 class="h2">At the rear doors</h3>
+          <p class="lead">The high-voltage side opens at the back, away from the crew’s seats.</p>
+        </div>
+        <div class="inbox">
+          <ul class="inbox__list">
+            <li><span>Connection panel with terminals labelled TDR, FLS, BT, <span class="nowrap">H.V 40 kV</span>, <span class="nowrap">H.V 80 kV</span> and Earth. Ratings <Slot /></span></li>
+            <li><span>Output cable reels, red and orange. Lengths <Slot /></span></li>
+            <li><span>A unit inside a mesh guard, wired to the panel. Function <Slot /></span></li>
+            <li><span>Instrument cases and a pull-out tray</span></li>
+          </ul>
+          <figure>
+            <div class="plate">
+              <Picture
+                src={rear.src}
+                formats={['avif', 'webp']}
+                widths={[480, 800, 1200, 1600]}
+                sizes="(min-width: 900px) 55vw, 100vw"
+                alt={rear.alt}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            {rear.caption && <figcaption class="figure-caption">{rear.caption}</figcaption>}
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section van-photos" aria-labelledby="photos-title">
+    <div class="wrap split">
+      <div class="split__head">
+        <h2 id="photos-title">Photos</h2>
+        <p class="lead">The van from each side, with the side and rear doors open, and two views inside the cabin.</p>
+      </div>
+      <div class="split__body">
+        <Gallery
+          product={van}
+          eager={false}
+          sizes="(min-width: 1400px) 872px, (min-width: 1024px) calc(66.7vw - 61px), calc(100vw - 32px)"
+          thumbSizes="(min-width: 1400px) 102px, (min-width: 1024px) calc(8.3vw - 15px), (min-width: 600px) calc(12.5vw - 11px), calc(25vw - 14px)"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="callout-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="callout-title">How a call-out works</h2>
+        <p class="lead">From parking to the dig spot, with the instruments that do each part.</p>
+      </div>
+      <ol class="sequence">
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Arrive</h3>
+          <p>Park at the cable end. Everything for the four steps is already on board.</p>
+        </li>
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Connect</h3>
+          <p>Earth first, then run the output cable from the reel to the faulty core.</p>
+        </li>
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Pre-locate</h3><span class="sequence__tag">With the <b>reflectometer</b></span>
+          <p>A low-voltage shot from the bench gives the distance to the fault in metres.</p>
+        </li>
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Surge</h3><span class="sequence__tag">With the <b>surge generator</b></span>
+          <p>A high-resistance fault is broken down; the arc reflection shot confirms the distance.</p>
+        </li>
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Pinpoint</h3><span class="sequence__tag">With the <b>route tracer and acoustic receiver</b></span>
+          <p>Trace the route to that distance, then listen for each surge. The discharge is loudest above the fault.</p>
+        </li>
+        <li>
+          <span class="sequence__node" aria-hidden="true"></span>
+          <h3>Mark the dig spot</h3>
+          <p>Mark it on the ground for the excavation crew.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="specs-title">
+    <div class="wrap split">
+      <div class="split__head">
+        <h2 id="specs-title">Specifications</h2>
+        {d.specsSource && <p class="muted small">{d.specsSource}</p>}
+      </div>
+      <div class="split__body">
+        <SpecTable groups={d.specs} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" aria-labelledby="faq-title">
+    <div class="wrap split">
+      <div class="split__head">
+        <h2 id="faq-title">Questions about the van</h2>
+      </div>
+      <div class="split__body--narrow faq">
+        <details open>
+          <summary>Is operator training available?</summary>
+          <div class="faq__answer"><p>Training on each instrument and on the whole sequence, from the first pulse to the dig spot: <Slot /></p></div>
+        </details>
+        <details>
+          <summary>Can you fit the equipment to our own vehicle?</summary>
+          <div class="faq__answer"><p><Slot /></p></div>
+        </details>
+        <details>
+          <summary>How long does delivery take?</summary>
+          <div class="faq__answer"><p>Delivery time: <Slot /></p></div>
+        </details>
+        <details>
+          <summary>Can the instruments be used outside the van?</summary>
+          <div class="faq__answer"><p>The acoustic receiver and the route-tracing receiver are hand-held and go out with the crew. Removing the bench instruments for use elsewhere: <Slot /></p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <QuoteBand heading={band.heading} lead={band.lead}>
+    <div class="btn-row" slot="actions">
+      <Button href="/contact">Talk to us about the van</Button>
+      <Button variant="secondary" href={askHref(van, SITE.email)}>Email a question</Button>
+    </div>
+  </QuoteBand>
+</BaseLayout>
+
+<script>
+  import '../scripts/catalog';
+</script>

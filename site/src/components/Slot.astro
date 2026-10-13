@@ -1,0 +1,13 @@
+---
+/**
+ * Placeholder for a fact we do not have yet: dashed underline, grey, "[to confirm]".
+ * Pass the text without brackets. Never invent a value instead of using this.
+ *   <Slot />                      → [to confirm]
+ *   <Slot text="to follow" />     → [to follow]
+ */
+interface Props {
+  text?: string;
+}
+const { text = 'to confirm' } = Astro.props;
+---
+<span class="slot">[{text}]</span>

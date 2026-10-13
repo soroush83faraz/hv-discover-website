@@ -1,0 +1,73 @@
+---
+/**
+ * Home quote starter: three questions about the cable. On submit (src/scripts/quote-starter.ts)
+ * it checks the two required answers and shows a summary with a link to /request-a-quote
+ * that carries the answers as ?voltage=…&length=…&fault=… (also in sessionStorage
+ * "hvd-quote-starter"). Without JS the form submits the same parameters by GET.
+ * The option texts match the selects on /request-a-quote (name="voltage", name="length").
+ */
+import { SITE } from '../data/site';
+
+const errorIcon =
+  '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 3.5v4.2M7 9.6v.9" stroke="currentColor" stroke-width="1.6"/></svg>';
+---
+<section class="section section--rule" id="quote" aria-labelledby="quote-title">
+  <div class="wrap quote-starter">
+    <div class="quote-starter__intro">
+      <h2 id="quote-title">Tell us about the cable. We&rsquo;ll recommend the kit.</h2>
+      <p class="lead">Three questions. If you are not sure, choose &ldquo;I don&rsquo;t know&rdquo; and we will ask the right follow-up.</p>
+    </div>
+    <form class="quote-form plate" action="/request-a-quote" method="get" data-quote-starter novalidate aria-labelledby="quote-title">
+      <div class="quote-form__fields">
+        <div class="field">
+          <label class="field__label" for="voltage">Cable voltage</label>
+          <select class="select" id="voltage" name="voltage" required aria-describedby="voltage-error">
+            <option value="">Choose a voltage</option>
+            <option>Low voltage, up to 1 kV</option>
+            <option>6 to 11 kV</option>
+            <option>20 kV</option>
+            <option>33 to 36 kV</option>
+            <option>Above 36 kV</option>
+            <option value="unknown">I don&rsquo;t know</option>
+          </select>
+          <p class="field__error" id="voltage-error" hidden><Fragment set:html={errorIcon} /><span></span></p>
+        </div>
+        <div class="field">
+          <label class="field__label" for="length">Approximate length</label>
+          <select class="select" id="length" name="length">
+            <option value="">Choose a length</option>
+            <option>Under 500 m</option>
+            <option>500 m to 2 km</option>
+            <option>2 to 5 km</option>
+            <option>5 to 20 km</option>
+            <option>Over 20 km</option>
+            <option value="unknown">I don&rsquo;t know</option>
+          </select>
+        </div>
+        <div class="field field--full">
+          <label class="field__label" for="fault">What is the cable doing?</label>
+          <select class="select" id="fault" name="fault" required aria-describedby="fault-error">
+            <option value="">Choose a fault type</option>
+            <option>Open circuit, broken conductor</option>
+            <option>Short circuit, low resistance</option>
+            <option>High resistance or intermittent</option>
+            <option>Sheath fault</option>
+            <option value="unknown">I don&rsquo;t know yet</option>
+          </select>
+          <p class="field__error" id="fault-error" hidden><Fragment set:html={errorIcon} /><span></span></p>
+        </div>
+      </div>
+      <div class="form-status" tabindex="-1" role="status" hidden>
+        <b>Answers saved:</b> <span data-summary></span> Next, add your contact details on the quote form. <a href="/request-a-quote" data-continue>Continue to the quote form</a>
+      </div>
+      <div class="quote-form__foot">
+        <p class="quote-form__note">Products in your quote list are added automatically. Reply by email from <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+        <button class="btn btn--primary" type="submit">Request a quote</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  import '../scripts/quote-starter';
+</script>

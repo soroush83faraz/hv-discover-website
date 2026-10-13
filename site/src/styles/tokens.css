@@ -1,0 +1,61 @@
+/* HV Discover design tokens.
+   Spec: docs/design/01-design-direction.md (v1). Ported from design/mockups/styles.css.
+   Archivo variable (self-hosted, wdth 62-125, wght 100-900): see src/styles/fonts.css. */
+
+/* ---------------------------------------------------------------- tokens */
+:root {
+  /* palette: an MV cable cross-section (spec section 2, values unchanged) */
+  --xlpe: #F3F5F4;        /* page background */
+  --white: #FFFFFF;       /* product plates */
+  --semicon: #1F2326;     /* text, dark surfaces (footer, readouts) */
+  --screen: #5E6266;      /* secondary text */
+  --rule: #D5DAD8;        /* hairlines, table rules, graticule */
+  --sheath: #F55231;      /* brand: pulse, fault marker, logo (graphics only on light: 3.42:1) */
+  --sheath-deep: #C7381B; /* primary fill, orange text on light: 5.24:1 white, 4.78:1 xlpe */
+  --copper: #B8743D;      /* conductor, diagrams only */
+
+  /* derived state values (not new roles) */
+  --sheath-deep-hover: #A92F16;  /* primary hover/pressed: 6.76:1 with white */
+  --on-dark-muted: #B9BEC1;      /* secondary text on semicon: 8.44:1 */
+
+  /* type */
+  --font: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --wd-text: 100%;
+  --wd-head: 118%;
+  --wd-plate: 125%;
+  --fs-13: 0.8125rem;
+  --fs-15: 0.9375rem;
+  --fs-18: 1.125rem;
+  --fs-21: 1.3125rem;
+  --fs-28: 1.75rem;
+  --fs-36: 2.25rem;
+  --fs-48: 3rem;
+  --fs-64: 4rem;
+  --fs-88: 5.5rem;
+
+  /* space: 8px base */
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 40px;
+  --s-6: 48px;
+  --s-8: 64px;
+  --s-9: 72px;
+  --s-10: 80px;
+  --s-12: 96px;
+  --s-15: 120px;
+
+  /* layout */
+  --max: 1320px;
+  --gutter: 24px;
+  --margin: 16px;
+  --section: var(--s-9);
+  --header-h: 72px;
+  --radius: 2px;
+
+  --ease-out: cubic-bezier(.2, .7, .2, 1);
+}
+@media (min-width: 1024px) {
+  :root { --margin: 40px; --section: var(--s-15); }
+}

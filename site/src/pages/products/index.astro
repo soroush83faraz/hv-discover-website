@@ -1,0 +1,105 @@
+---
+/**
+ * /products: port of design/mockups/products.html.
+ * The six instruments grouped by family (src/data/families.ts), and the cable test van as a
+ * showcase in "Integrated system" (no Add to quote: NameplateTile links to its page), with
+ * the family filter (src/scripts/catalog.ts). Without JS the filter is hidden and every family is listed;
+ * /products#<family-id> deep links to a family (with JS: the filter shows only that family).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NameplateTile from '../../components/NameplateTile.astro';
+import FamilyDiagram from '../../components/FamilyDiagram.astro';
+import QuoteBand from '../../components/QuoteBand.astro';
+import Button from '../../components/Button.astro';
+import { FAMILIES } from '../../data/families';
+import { getProducts, isQuotable } from '../../lib/products';
+import { breadcrumbList, productItemList } from '../../lib/jsonld';
+import '../../styles/pages-a.css';
+
+const products = await getProducts();
+const families = FAMILIES.map((f) => ({ ...f, products: products.filter((p) => p.data.family === f.step) })).filter(
+  (f) => f.products.length > 0,
+);
+const tileSizes = '(min-width: 1024px) 33vw, (min-width: 600px) 50vw, 100vw';
+const stepPrefix = (step: number | 'system') => (step === 'system' ? 'Steps 1 to 4: ' : `Step ${step}: `);
+
+const jsonLd = [
+  breadcrumbList([
+    { name: 'Home', path: '/' },
+    { name: 'Products', path: '/products' },
+  ]),
+  productItemList(products.filter(isQuotable), 'HV Discover cable fault location instruments'),
+];
+---
+<BaseLayout
+  title="Products: cable fault location instruments | HV Discover"
+  description="HV Discover instruments grouped by the step they do: pre-location, surge and conditioning, pinpointing, route tracing, and the cable test van."
+  jsonLd={jsonLd}
+>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>Fault location instruments, in the order you use them.</h1>
+      <p class="lead">Grouped by the step they do, from the first pulse to the dig spot.</p>
+    </div>
+
+    <div class="filter" data-filter>
+      <p class="filter__label" id="filter-label">Show</p>
+      <div class="filter__group" role="group" aria-labelledby="filter-label">
+        <button class="filter__btn" type="button" data-filter-value="all" aria-pressed="true">All</button>
+        {
+          families.map((f) => (
+            <button class="filter__btn" type="button" data-filter-value={f.id} aria-pressed="false">
+              {f.step !== 'system' && <span class="filter__num" aria-hidden="true">{f.step}</span>}
+              {f.step !== 'system' && <span class="sr-only">{stepPrefix(f.step)}</span>}
+              {f.name}
+            </button>
+          ))
+        }
+      </div>
+      <p class="sr-only" id="filter-status" aria-live="polite"></p>
+    </div>
+    <p class="sr-only" id="quote-status" aria-live="polite"></p>
+
+    <div class="families">
+      {
+        families.map((f) => (
+          <section class="family" id={f.id} data-family={f.name} aria-labelledby={`${f.id}-title`}>
+            <div class="family__grid">
+              <div class="family__head">
+                {f.step === 'system' ? (
+                  <span class="family__num family__num--range" aria-hidden="true">1–4</span>
+                ) : (
+                  <span class="family__num" aria-hidden="true">{f.step}</span>
+                )}
+                <h2 id={`${f.id}-title`}><span class="sr-only">{stepPrefix(f.step)}</span>{f.name}</h2>
+                <p class="family__task">{f.task}</p>
+                <p class="family__text">{f.text}</p>
+                <FamilyDiagram step={f.step} class="family__diagram" />
+              </div>
+              <div class="family__items">
+                {f.products.map((p) => (
+                  <NameplateTile product={p} row={f.products.length === 1} sizes={tileSizes} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <QuoteBand
+    heading="Not sure which instruments you need?"
+    lead="Tell us the cable voltage, the length and what the fault is doing. We’ll recommend the set."
+    class="closing"
+  >
+    <div class="btn-row" slot="actions">
+      <Button href="/request-a-quote">Request a quote</Button>
+      <Button variant="secondary" href="/fault-location">How fault location works</Button>
+    </div>
+  </QuoteBand>
+</BaseLayout>
+
+<script>
+  import '../../scripts/catalog';
+</script>

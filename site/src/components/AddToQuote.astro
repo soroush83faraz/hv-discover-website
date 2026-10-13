@@ -1,0 +1,22 @@
+---
+/**
+ * "Add to quote" toggle for one product. Behaviour comes from src/scripts/quote-list.ts
+ * (loaded by Header.astro on every page), which keeps aria-pressed and the label in step
+ * with the quote list in localStorage. `id` is the product model, e.g. "TDR-901".
+ *   <AddToQuote id={product.data.model} />                       (tile: secondary, small)
+ *   <AddToQuote id={product.data.model} variant="primary" size="md" srName={false} />
+ */
+interface Props {
+  id: string;
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'sm';
+  /** Add a visually hidden ": <id>" so the button names its product (in lists of tiles). */
+  srName?: boolean;
+}
+const { id, variant = 'secondary', size = 'sm', srName = true } = Astro.props;
+const classes = ['btn', `btn--${variant}`, size === 'sm' && 'btn--sm', 'add-quote'].filter(Boolean).join(' ');
+---
+<button class={classes} type="button" data-add-quote={id} aria-pressed="false">
+  <svg class="add-quote__tick" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7.5l3.2 3L12 3.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+  <span class="add-quote__label">Add to quote</span>{srName && <span class="sr-only">: {id}</span>}
+</button>

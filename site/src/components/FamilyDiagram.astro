@@ -1,0 +1,65 @@
+---
+/**
+ * Small line diagram of the physics behind each family (design spec 5): 1.5px graphite
+ * with one orange point. Used on the workflow line and the catalog family heads.
+ *   <FamilyDiagram step={1} class="station__diagram" />
+ *   <FamilyDiagram step="system" class="family__diagram" />
+ */
+import { getFamily, type FamilyStep } from '../data/families';
+
+interface Props {
+  step: FamilyStep;
+  class?: string;
+  /** Overrides the accessible name from src/data/families.ts. */
+  label?: string;
+}
+const { step, class: className, label = getFamily(step).diagramLabel } = Astro.props;
+---
+<svg class={className} viewBox="0 0 200 64" role="img" aria-label={label}>
+  {
+    step === 1 && (
+      <>
+        <path class="fam" d="M4 50H9C11 50 12 14 15 14S19 53 23 53L26 50H118C121 50 122 26 126 26S133 48 142 50H196" />
+        <circle class="fam-point" cx="126" cy="26" r="4" />
+      </>
+    )
+  }
+  {
+    step === 2 && (
+      <>
+        <path class="fam" d="M4 52H36L39 10C46 14 54 38 72 46S98 52 112 52H124L127 30C132 33 139 44 150 48S170 52 196 52" />
+        <circle class="fam-point" cx="39" cy="10" r="4" />
+      </>
+    )
+  }
+  {
+    step === 3 && (
+      <>
+        <path class="fam-thin" d="M14 24l-6 6M34 24l-6 6M54 24l-6 6M74 24l-6 6M134 24l-6 6M154 24l-6 6M174 24l-6 6M194 24l-6 6" />
+        <path class="fam" d="M4 24H196M4 54H196M90 54A10 10 0 0 1 110 54M82 54A18 18 0 0 1 118 54M74 54A26 26 0 0 1 126 54M94 24V17H106V24M100 17V3" />
+        <circle class="fam-point" cx="100" cy="54" r="4" />
+      </>
+    )
+  }
+  {
+    step === 4 && (
+      <>
+        <path class="fam-thin" d="M8 4h44v26H8zM70 4h52v26H70zM140 4h52v26h-52zM8 48h44v14H8zM70 48h52v14H70zM140 48h52v14h-52z" />
+        <path class="fam" d="M2 39H131V62" />
+        <circle class="fam-point" cx="96" cy="39" r="4" />
+      </>
+    )
+  }
+  {
+    step === 'system' && (
+      <>
+        <path class="fam" d="M4 32H14M26 32H59M71 32H104M116 32H149M161 32H190" />
+        <circle class="fam" cx="20" cy="32" r="6" />
+        <circle class="fam" cx="65" cy="32" r="6" />
+        <circle class="fam" cx="110" cy="32" r="6" />
+        <circle class="fam" cx="155" cy="32" r="6" />
+        <circle class="fam-point" cx="192" cy="32" r="4" />
+      </>
+    )
+  }
+</svg>

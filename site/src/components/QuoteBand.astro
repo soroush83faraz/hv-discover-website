@@ -1,0 +1,51 @@
+---
+/**
+ * Closing quote band: a white plate with a heading, a lead and actions, inside its own
+ * section. With `model`, the actions are "Add to quote" + "Request a quote"; pass a
+ * different set through the "actions" slot (e.g. the van's contact call to action).
+ *   <QuoteBand heading={p.data.quoteBand.heading} lead={p.data.quoteBand.lead} model={p.data.model} />
+ *   <QuoteBand heading="Not sure which instruments you need?" lead="…" class="closing">
+ *     <div class="btn-row" slot="actions">…</div>
+ *   </QuoteBand>
+ */
+import { inline } from '../lib/inline';
+import AddToQuote from './AddToQuote.astro';
+import Button from './Button.astro';
+
+interface Props {
+  /** inline syntax: use ~MODEL~ to keep a model on one line. */
+  heading: string;
+  lead: string;
+  /** Product model for the default actions. */
+  model?: string;
+  /** Extra class on the section, e.g. "closing". */
+  class?: string;
+  id?: string;
+}
+const { heading, lead, model, class: extra, id = 'band-title' } = Astro.props;
+const hasActions = Astro.slots.has('actions');
+---
+<section class:list={['section', extra]} aria-labelledby={id}>
+  <div class="wrap">
+    <div class="quote-band plate">
+      <div>
+        <h2 id={id}><Fragment set:html={inline(heading)} /></h2>
+        <p class="lead">{lead}</p>
+      </div>
+      {
+        hasActions ? (
+          <slot name="actions" />
+        ) : (
+          model && (
+            <div class="btn-row">
+              <AddToQuote id={model} variant="primary" size="md" srName={false} />
+              <Button variant="secondary" href="/request-a-quote">
+                Request a quote
+              </Button>
+            </div>
+          )
+        )
+      }
+    </div>
+  </div>
+</section>

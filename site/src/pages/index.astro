@@ -1,0 +1,173 @@
+---
+/**
+ * Home: port of design/mockups/index.html.
+ * Hero instrument, the four-step workflow, the cable test van, the six instrument tiles
+ * with the van as a showcase tile (no quote button), support, and the quote starter.
+ */
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TdrInstrument from '../components/TdrInstrument.astro';
+import WorkflowLine from '../components/WorkflowLine.astro';
+import NameplateTile from '../components/NameplateTile.astro';
+import QuoteStarter from '../components/QuoteStarter.astro';
+import Button from '../components/Button.astro';
+import Slot from '../components/Slot.astro';
+import { getProducts } from '../lib/products';
+import { SITE } from '../data/site';
+import vanExterior from '../assets/img/van-exterior.jpg';
+import vanInterior from '../assets/img/van-interior.jpg';
+
+const products = await getProducts();
+const instruments = products.filter((p) => p.data.family !== 'system');
+const van = products.find((p) => p.data.family === 'system');
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  logo: new URL('/favicon.svg', SITE.url).href,
+  email: SITE.email,
+  // City and country only: the street address in site.ts is a placeholder and stays out of structured data.
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.city,
+    addressCountry: SITE.countryCode,
+  },
+};
+---
+<BaseLayout
+  title="HV Discover: cable fault location instruments"
+  description="Instruments that turn a failed underground cable into a distance in metres, then into the exact spot to dig: TDR, surge generators, pinpointer and route tracer."
+  jsonLd={[organization]}
+>
+  <!-- HERO: the instrument -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero__inner">
+      <div class="hero__copy">
+        <h1 class="display" id="hero-title">Every cable fault <br class="br-lg" />has an address.</h1>
+        <p class="hero__sub">Instruments that turn a failed underground cable into a distance in metres, then into the exact spot to dig.</p>
+        <div class="btn-row hero__actions">
+          <Button href="#quote">Request a quote</Button>
+          <Button variant="secondary" href="/fault-location">How fault location works</Button>
+        </div>
+      </div>
+      <TdrInstrument />
+    </div>
+  </section>
+
+  <!-- WORKFLOW -->
+  <section class="section workflow" id="fault-location" aria-labelledby="wf-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="wf-title">Four steps from a failed cable to a dig spot.</h2>
+        <p class="lead">Fault location is a sequence. Each step narrows the search, and every instrument we supply belongs to one of them.</p>
+      </div>
+      <WorkflowLine />
+    </div>
+  </section>
+
+  <!-- CABLE TEST VAN -->
+  <section class="section section--white van" id="van" aria-labelledby="van-title">
+    <div class="wrap">
+      <div class="van__top">
+        <figure class="van__photo">
+          <Picture
+            src={vanExterior}
+            formats={['avif', 'webp']}
+            widths={[480, 800, 1200, 1600]}
+            sizes="(min-width: 900px) 66vw, 100vw"
+            loading="lazy"
+            decoding="async"
+            alt="The HV Discover cable test van: a white high-roof van with ‘HV Cable Test Van’ on its side, seen from the front left."
+          />
+        </figure>
+        <div class="van__copy">
+          <h2 id="van-title">The whole workflow, on four wheels.</h2>
+          <p>The cable test van carries every step of the sequence, fitted and wired: reflectometer, surge generator, acoustic receiver and route tracer, with the high-voltage connections at the rear doors. The crew arrives ready to measure.</p>
+          <a class="text-link" href="/cable-test-van">About the cable test van</a>
+        </div>
+      </div>
+
+      <div class="van__bottom">
+        <div class="van__list">
+          <h3 class="fitted__title">Fitted equipment</h3>
+          <ul class="fitted">
+            <li><span class="fitted__step">Step 1</span><span class="fitted__what"><b>Reflectometer</b></span></li>
+            <li><span class="fitted__step">Step 2</span><span class="fitted__what"><b>Surge generator</b> <span>with the HV connection panel at the rear doors</span></span></li>
+            <li><span class="fitted__step">Step 3</span><span class="fitted__what"><b>Acoustic receiver</b> <span>with headphones</span></span></li>
+            <li><span class="fitted__step">Step 4</span><span class="fitted__what"><b>Route tracer</b> <span>transmitter and receiver</span></span></li>
+            <li><span class="fitted__step">Cabin</span><span class="fitted__what"><span>Control panel with meters and UPS</span></span></li>
+            <li><span class="fitted__step">Rear doors</span><span class="fitted__what"><span>HV connection panel and four cable reels</span></span></li>
+          </ul>
+          <p class="figure-caption">Instrument models, vehicle base, power supply and cable lengths: <Slot /></p>
+        </div>
+        <figure class="van__interior">
+          <div class="plate">
+            <Picture
+              src={vanInterior}
+              formats={['avif', 'webp']}
+              widths={[480, 800, 1200, 1600]}
+              sizes="(min-width: 900px) 58vw, 100vw"
+              loading="lazy"
+              decoding="async"
+              alt="Inside the van: an instrument bench with a surge set and two orange instrument cases, a control panel with meters, a UPS, and a pull-out drawer holding a hand-held receiver and headphones."
+            />
+          </div>
+          <figcaption class="figure-caption">Inside: the instrument bench, control panel and UPS, with a pull-out drawer for the hand-held receivers.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="section" id="products" aria-labelledby="products-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="products-title">Six instruments, one <span class="nowrap">fault-location</span> chain.</h2>
+        <p class="lead">Each instrument works on its own and as part of the sequence. Add what you need to the quote list and send it as one request. The cable test van covers all four steps.</p>
+      </div>
+      <p class="sr-only" id="quote-status" aria-live="polite"></p>
+
+      <div class="tiles">
+        {instruments.map((p) => <NameplateTile product={p} />)}
+        {van && <NameplateTile product={van} wide sizes="(min-width: 600px) 50vw, 100vw" />}
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="section" id="support" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="support-title">Support that stays with the instrument.</h2>
+        <p class="lead">Training, calibration, spare parts and remote help are arranged through support, by model number.</p>
+      </div>
+      <div class="support-cols">
+        <div class="support-col">
+          <h3>Training</h3>
+          <p>Operator training on each instrument and on the whole sequence, from the first pulse to the dig spot. Ask for it with your quote.</p>
+        </div>
+        <div class="support-col">
+          <h3>Calibration</h3>
+          <p>Instruments ship with a calibration certificate. Recalibration and checks are arranged through support.</p>
+        </div>
+        <div class="support-col">
+          <h3>Spare parts</h3>
+          <p>Ask for test leads, clamps, earth rods, filters and carrying cases by model number.</p>
+        </div>
+        <div class="support-col">
+          <h3>Remote help</h3>
+          <p>Send a screenshot of the trace or a description of the fault. We reply by email.</p>
+        </div>
+      </div>
+      <div class="support__foot small">
+        <a class="text-link" href="/support">Support</a>
+        <a class="text-link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE STARTER -->
+  <QuoteStarter />
+</BaseLayout>

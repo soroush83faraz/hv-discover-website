@@ -1,0 +1,62 @@
+---
+/**
+ * Site footer (semicon): brand line, product links (from the products collection),
+ * company links, contact details. Links to the current page get aria-current="page".
+ */
+import logoReversed from '../assets/brand/logo-reversed.svg';
+import { FOOTER_COMPANY, SITE } from '../data/site';
+import { getInstruments, productHref, shortLabel } from '../lib/products';
+
+const instruments = await getInstruments();
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const current = (href: string) => (path === href ? 'page' : undefined);
+const year = new Date().getFullYear();
+---
+<footer class="site-footer" id="contact">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src={logoReversed.src} alt="HV Discover" width="114" height="34" loading="lazy" />
+        <p>{SITE.tagline}</p>
+      </div>
+      <nav class="footer-col footer-col--products" aria-labelledby="f-products">
+        <h2 id="f-products">Products</h2>
+        <ul>
+          {
+            instruments.map((p) => (
+              <li>
+                <a href={productHref(p)} aria-current={current(productHref(p))}>
+                  {shortLabel(p)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <nav class="footer-col footer-col--company" aria-labelledby="f-company">
+        <h2 id="f-company">Company</h2>
+        <ul>
+          {
+            FOOTER_COMPANY.map((l) => (
+              <li>
+                <a href={l.href} aria-current={current(l.href)}>
+                  {l.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="footer-col footer-col--contact footer-contact">
+        <h2>Contact</h2>
+        <p><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+        <address class="footer-address">
+          {SITE.address.map((line, i) => (i < SITE.address.length - 1 ? <>{line}<br /></> : line))}
+        </address>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; {year} HV Discover</span>
+    </div>
+  </div>
+</footer>

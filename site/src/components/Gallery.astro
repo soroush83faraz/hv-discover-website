@@ -1,0 +1,136 @@
+---
+/**
+ * Product gallery for the product page hero (design spec 6.5): a 4:3 white stage, a row of
+ * thumbnails and a caption. One photo: stage and caption only. No photo: the line drawing.
+ * Thumbnails crossfade the stage in 200 ms (src/scripts/gallery.ts).
+ *   <Gallery product={product} />
+ *   <Gallery product={van} eager={false} sizes="…" thumbSizes="…" />   (lower on a page)
+ *
+ * Loading: only the first photo is in the HTML (eager with fetchpriority="high" in a page hero,
+ * lazy otherwise). The script adds the second stage layer on the first thumbnail click, so no
+ * other stage photo is downloaded until it is asked for. Thumbnails are lazy, 100/200 px wide
+ * when there are more than four (eight columns, 88 px at 1440), 200/400 px otherwise.
+ * Portrait photos sit whole on the same 4:3 plate (object-fit: contain): their `sizes` are
+ * scaled to the width they really fill, so the browser does not fetch a wider file than shown.
+ * The stage uses a plain <img> with a WebP srcset (not <picture>) because the script swaps
+ * src/srcset/sizes between two layers.
+ */
+import { getImage } from 'astro:assets';
+import type { Product } from '../lib/products';
+import PlaceholderDrawing from './PlaceholderDrawing.astro';
+
+interface Props {
+  product: Product;
+  /** `sizes` of the stage: the width of the gallery column. Default: the product page hero (7 of 12 columns). */
+  sizes?: string;
+  /** `sizes` of one thumbnail. Default: the product page hero (4 or 8 columns, see components.css). */
+  thumbSizes?: string;
+  /** First photo eager with fetchpriority="high" (page hero). false: lazy, for a gallery lower down. */
+  eager?: boolean;
+}
+
+const {
+  product,
+  sizes = '(min-width: 1400px) 760px, (min-width: 1024px) 55vw, calc(100vw - 32px)',
+  eager = true,
+} = Astro.props;
+const d = product.data;
+const MANY = 4; // more thumbnails than this: eight columns from 600 px, four below (components.css)
+const many = d.images.length > MANY;
+const thumbSizes =
+  Astro.props.thumbSizes ??
+  (many
+    ? '(min-width: 1400px) 88px, (min-width: 1024px) calc(7vw - 7px), (min-width: 600px) calc(12.5vw - 11px), calc(25vw - 14px)'
+    : '(min-width: 1400px) 184px, (min-width: 1024px) calc(14vw - 6px), calc(25vw - 14px)');
+const thumbWidths = many ? [100, 200] : [200, 400];
+const STAGE_RATIO = 4 / 3;
+
+/** Scale every length in a `sizes` list: "(min-width: 1024px) 55vw, 100vw" × 0.5 → "(…) calc(55vw * 0.5), calc(100vw * 0.5)". */
+function scaleSizes(list: string, f: number): string {
+  if (f >= 1) return list;
+  const k = f.toFixed(3);
+  return list
+    .split(',')
+    .map((entry) => {
+      const m = entry.trim().match(/^(\(.*\))\s+(.+)$/);
+      return m ? `${m[1]} calc(${m[2]} * ${k})` : `calc(${entry.trim()} * ${k})`;
+    })
+    .join(', ');
+}
+
+const photos = await Promise.all(
+  d.images.map(async (img) => {
+    // A photo narrower than the 4:3 stage (a portrait) fills only part of its width.
+    const fill = Math.min(1, img.src.width / img.src.height / STAGE_RATIO);
+    const stage = await getImage({ src: img.src, widths: [480, 800, 1200, 1600], format: 'webp' });
+    const thumb = await getImage({ src: img.src, width: thumbWidths[0], widths: thumbWidths, format: 'webp' });
+    return {
+      ...img,
+      stage,
+      thumb,
+      stageSizes: scaleSizes(sizes, fill),
+      thumbSizes: scaleSizes(thumbSizes, fill),
+    };
+  }),
+);
+const first = photos[0];
+const label = photos.length > 1 ? `${d.model} photos` : first ? `${d.model} photo` : `${d.model} picture`;
+---
+<section class="gallery" data-gallery={photos.length > 1 ? '' : undefined} aria-label={label}>
+  <div class="gallery__stage plate">
+    {
+      first ? (
+        <img
+          src={first.stage.src}
+          srcset={first.stage.srcSet.attribute}
+          sizes={first.stageSizes}
+          width={first.src.width}
+          height={first.src.height}
+          alt={first.alt}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+          decoding={eager ? undefined : 'async'}
+        />
+      ) : (
+        d.drawing && <PlaceholderDrawing type={d.drawing} label={d.drawingAlt} caption="Line drawing. Photo coming soon." />
+      )
+    }
+  </div>
+  {
+    photos.length > 1 && (
+      <div class:list={['gallery__thumbs', many && 'gallery__thumbs--many']} role="group" aria-label="Choose a photo">
+        {photos.map((p, i) => (
+          <button
+            class="thumb"
+            type="button"
+            aria-current={i === 0 ? 'true' : 'false'}
+            data-src={p.stage.src}
+            data-srcset={p.stage.srcSet.attribute}
+            data-sizes={p.stageSizes}
+            data-alt={p.alt}
+            data-caption={p.caption ?? ''}
+          >
+            <img
+              src={p.thumb.src}
+              srcset={p.thumb.srcSet.attribute}
+              sizes={p.thumbSizes}
+              alt=""
+              width={thumbWidths[0]}
+              height={Math.round((thumbWidths[0]! * p.src.height) / p.src.width)}
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="sr-only">{`Photo ${i + 1} of ${photos.length}${p.thumbLabel ? `: ${p.thumbLabel}` : ''}`}</span>
+          </button>
+        ))}
+      </div>
+    )
+  }
+  <p class="gallery__caption" aria-live={photos.length > 1 ? 'polite' : undefined}>
+    {first ? (first.caption ?? '') : 'The drawing stands in until the product is photographed.'}
+  </p>
+</section>
+
+<script>
+  import '../scripts/gallery';
+</script>

@@ -1,0 +1,108 @@
+---
+/**
+ * Contact: port of design/mockups/contact.html (pages-b.css).
+ * Contact details with the office locator, and the contact form (src/scripts/contact.ts).
+ * With JavaScript the form is sent by fetch (src/scripts/lib/submit.ts, api/CLIENT.md) and the
+ * sent state shows in place with the reference; without it, it posts to /api/contact.php,
+ * which redirects back to /contact?ref=…#message-sent (the box shows through :target).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Slot from '../components/Slot.astro';
+import { SITE } from '../data/site';
+import { breadcrumbs } from '../lib/structured-data';
+import '../styles/pages-b.css';
+---
+<BaseLayout
+  title="Contact HV Discover"
+  description="Ask HV Discover about an instrument, a cable network or a trace you can't read. Email us or use the contact form. Office in London, UK."
+  jsonLd={[breadcrumbs([{ name: 'Contact', path: '/contact' }])]}
+>
+  <div class="wrap page-head">
+    <h1 class="page-title">Contact</h1>
+    <p class="page-head__sub">Questions about an instrument, a network or a trace you can&rsquo;t read. Write to us and we reply by email.</p>
+  </div>
+
+  <div class="wrap contact">
+    <section class="contact__info" aria-labelledby="details-title">
+      <h2 class="sr-only" id="details-title">Contact details</h2>
+      <dl class="contact-list">
+        <div><dt>Email</dt><dd><a class="big" href={`mailto:${SITE.email}`}>{SITE.email}</a></dd></div>
+        <div><dt>Office</dt><dd><address>{SITE.address.map((line, i) => (i < SITE.address.length - 1 ? <>{line}<br /></> : line))}</address></dd></div>
+        <div><dt>Phone</dt><dd><Slot text="UK phone number" /></dd></div>
+        <div><dt>Office hours</dt><dd>{SITE.hours}</dd></div>
+        <div><dt>Prices</dt><dd>Use the <a href="/request-a-quote">quote list</a>: one request for every instrument you need.</dd></div>
+        <div><dt>Service</dt><dd>Model and serial number, please. See <a href="/support#service">how to request service</a>.</dd></div>
+        <div><dt>Company</dt><dd><Slot text="registered company name" /></dd></div>
+      </dl>
+
+      <figure class="locator plate" aria-labelledby="loc-caption">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <line class="locator__x" x1="64" y1="0" x2="64" y2="100" vector-effect="non-scaling-stroke"/>
+          <line class="locator__x" x1="0" y1="38" x2="100" y2="38" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <svg class="locator__mark" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <circle class="locator__ring" cx="20" cy="20" r="13"/>
+          <circle class="locator__pt" cx="20" cy="20" r="5"/>
+        </svg>
+        <div class="locator__card">
+          <span class="readout__label">Office</span>
+          <span class="locator__city">{SITE.city}</span>
+          <span class="locator__meta">{SITE.country}</span>
+        </div>
+        <figcaption class="sr-only" id="loc-caption">Office location: {SITE.city}, {SITE.country}.</figcaption>
+      </figure>
+    </section>
+
+    <section class="contact__form" aria-labelledby="form-title">
+      <form class="form-plate plate" id="contact-form" action="/api/contact.php" method="post" novalidate aria-labelledby="form-title">
+        <h2 class="form-title" id="form-title">Send a message</h2>
+        <div class="form-status form-alert" data-form-alert hidden>
+          <b data-form-alert-title>Check the form.</b> <span data-form-alert-text></span>
+        </div>
+        <div class="quote-form__fields">
+          <div class="field">
+            <label class="field__label" for="c-name">Name</label>
+            <input class="input" id="c-name" name="name" type="text" maxlength="100" autocomplete="name" required
+                   data-msg-required="Enter your name, so we know who to reply to." aria-describedby="c-name-error">
+            <p class="field__error" id="c-name-error" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 3.5v4.2M7 9.6v.9" stroke="currentColor" stroke-width="1.6"/></svg><span></span></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="c-email">Email</label>
+            <input class="input" id="c-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" spellcheck="false" required
+                   data-msg-required="Enter your email address. Our reply goes there."
+                   data-msg-invalid="Enter an email address in the form name@company.com." aria-describedby="c-email-error">
+            <p class="field__error" id="c-email-error" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 3.5v4.2M7 9.6v.9" stroke="currentColor" stroke-width="1.6"/></svg><span></span></p>
+          </div>
+          <div class="field field--full">
+            <label class="field__label" for="c-company">Company <span class="field__opt">optional</span></label>
+            <input class="input" id="c-company" name="company" type="text" maxlength="150" autocomplete="organization">
+          </div>
+          <div class="field field--full">
+            <label class="field__label" for="c-message">Message</label>
+            <textarea class="input textarea" id="c-message" name="message" rows="6" maxlength="5000" required
+                      data-msg-required="Write your question. For a fault, give the cable type, its length and what you see."
+                      aria-describedby="c-message-hint c-message-error"></textarea>
+            <p class="field__hint" id="c-message-hint">For a fault: cable type, length, and what the instruments show.</p>
+            <p class="field__error" id="c-message-error" hidden><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 3.5v4.2M7 9.6v.9" stroke="currentColor" stroke-width="1.6"/></svg><span></span></p>
+          </div>
+        </div>
+        <div class="form-status" id="message-sent" data-form-done tabindex="-1" role="status" hidden>
+          <b>Message sent.</b> We reply<span data-done-email-wrap hidden> to <span class="nowrap" data-done-email></span></span> within <Slot text="reply time" />.<span data-done-ref-wrap hidden> Your reference: <b class="nowrap" data-done-ref></b>.</span>
+        </div>
+        <div class="hp-field">
+          <label for="c-website">Leave this field empty</label>
+          <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-foot">
+          <p class="quote-form__note">We use your details only to answer this message. See the <a href="/privacy">privacy notice</a>.</p>
+          <Button type="submit">Send message</Button>
+        </div>
+      </form>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/contact';
+</script>

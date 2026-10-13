@@ -1,0 +1,25 @@
+{
+  "name": "hvdiscover-site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "sync-api": "node scripts/sync-api.mjs",
+    "prebuild": "node scripts/sync-api.mjs",
+    "build": "astro build",
+    "build:preview": "node scripts/build-preview.mjs",
+    "preview": "astro preview --port 4330",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/archivo": "^5.3.0",
+    "astro": "^5.18.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^5.9.3"
+  }
+}

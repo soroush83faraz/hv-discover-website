@@ -1,0 +1,265 @@
+/* Page sections, set A: /products, /products/<slug> and /cable-test-van.
+   Import it in those pages only (import '../styles/pages-a.css'): it shares selectors
+   (.page-head, .faq) with pages-b.css that are styled differently.
+   Ported unchanged from design/mockups/pages-a.css; every value comes from tokens.css. */
+
+/* ---------------------------------------------------------------- page head (catalog) */
+.page-head { padding-top: var(--s-5); padding-bottom: var(--s-4); }
+.page-head h1 {
+  font-size: clamp(2.25rem, 2.4vw + 1.5rem, var(--fs-64));
+  line-height: 1.04;
+  max-width: 17ch;
+}
+.page-head .lead { margin-top: var(--s-2); max-width: 52ch; }
+@media (min-width: 1024px) {
+  .page-head { padding-top: var(--s-8); padding-bottom: var(--s-5); }
+}
+
+/* ---------------------------------------------------------------- family filter */
+/* Shown only when JS runs (html.js); without JS every family is listed. */
+.filter { display: none; }
+.js .filter { display: block; padding: var(--s-2) 0 var(--s-3); }
+.filter__label { font-size: var(--fs-13); color: var(--screen); margin-bottom: var(--s-1); }
+.filter__group { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.filter__btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 14px;
+  background: var(--white); color: var(--semicon);
+  border: 1px solid var(--rule); border-radius: var(--radius);
+  font-size: var(--fs-15); font-weight: 500; line-height: 1.2;
+  transition: border-color .15s, background-color .15s, color .15s;
+}
+.filter__btn:hover { border-color: var(--semicon); }
+.filter__btn[aria-pressed="true"] { background: var(--semicon); border-color: var(--semicon); color: var(--white); }
+.filter__num { font-stretch: var(--wd-plate); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- catalog families */
+.families { padding-bottom: 0; }
+.closing { padding-top: var(--s-2); }
+.family { padding: var(--s-5) 0 var(--s-6); border-top: 1px solid var(--semicon); }
+.family[hidden] { display: none; }
+.family__grid { display: grid; gap: var(--s-4); }
+.family__num {
+  display: block;
+  font-stretch: var(--wd-plate); font-weight: 650; font-size: var(--fs-48); line-height: 1;
+  letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+}
+.family__num--range { color: var(--screen); }
+.family__head h2 { margin-top: var(--s-2); font-size: clamp(1.75rem, 1vw + 1.4rem, var(--fs-36)); }
+.family__task { margin-top: 6px; font-weight: 500; }
+.family__text { margin-top: var(--s-2); font-size: var(--fs-15); color: var(--screen); max-width: 38ch; }
+.family__diagram { margin-top: var(--s-3); width: 100%; max-width: 240px; height: auto; }
+.family__items { display: grid; gap: var(--gutter); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 600px) {
+  .family__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .family__items > .tile--row { grid-column: 1 / -1; }
+}
+@media (min-width: 1024px) {
+  .family { padding: var(--s-6) 0 var(--s-8); }
+  .family__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .family__head { grid-column: 1 / span 4; position: sticky; top: calc(var(--header-h) + var(--s-3)); align-self: start; }
+  .family__items { grid-column: 5 / span 8; }
+}
+
+/* horizontal nameplate tile: photo left, facts right (single-product families, van) */
+@media (min-width: 600px) {
+  .tile--row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile--row .tile__body { border-top: 0; border-left: 1px solid var(--rule); }
+  .tile--row .tile__model a::after { inset: 0 50% 0 0; aspect-ratio: auto; }
+}
+
+/* ---------------------------------------------------------------- product page additions */
+/* placeholder drawing at gallery size */
+.gallery__stage > .drawing { position: absolute; inset: 0; }
+.gallery__stage .drawing__caption { left: var(--s-3); bottom: var(--s-2); font-size: var(--fs-15); }
+
+/* key facts when there are no figures yet */
+.keyfigs--text dd {
+  font-stretch: var(--wd-text); font-size: var(--fs-18); font-weight: 600;
+  line-height: 1.35; letter-spacing: 0;
+}
+.datasheet--none { color: var(--screen); }
+
+/* ARM Filter: the method in two traces and one schematic */
+.traces { display: grid; gap: var(--s-4); }
+.lead + .traces { margin-top: var(--s-5); }
+@media (min-width: 700px) { .traces { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gutter); } }
+.trace { border-top: 1px solid var(--semicon); padding-top: var(--s-2); }
+.trace svg { width: 100%; height: auto; margin-top: var(--s-1); }
+.trace figcaption { margin-top: var(--s-1); font-size: var(--fs-15); color: var(--screen); max-width: 44ch; }
+.trace figcaption b { color: var(--semicon); font-weight: 600; }
+.trace__label { fill: var(--screen); font-size: 12px; font-family: var(--font); }
+.trace__label--hot { fill: var(--sheath-deep); font-weight: 600; }
+.trace__mark { fill: none; stroke: var(--sheath); stroke-width: 1; stroke-dasharray: 3 3; }
+.method__text { margin-top: var(--s-5); }
+.schematic { margin-top: var(--s-5); }
+.schematic svg { width: 100%; max-width: 620px; height: auto; }
+.schematic__box { fill: var(--white); stroke: var(--semicon); stroke-width: 1.5; }
+.schematic__box--here { stroke: var(--semicon); stroke-width: 2.5; }
+.schematic__name { fill: var(--semicon); font-family: var(--font); font-size: 14px; font-weight: 700; font-stretch: 118%; }
+.schematic__note { fill: var(--screen); font-family: var(--font); font-size: 12px; }
+
+/* PG-10 or PG-32: comparison table built on .spec */
+.spec--compare th, .spec--compare td { width: auto; }
+.spec--compare thead th {
+  padding: 0 var(--s-2) 10px 0; border-bottom: 1px solid var(--semicon);
+  font-stretch: var(--wd-plate); font-size: var(--fs-21); font-weight: 700; color: var(--semicon); letter-spacing: -0.01em;
+}
+.spec--compare thead th:first-child { width: 36%; }
+.spec--compare td { padding-right: var(--s-2); }
+.spec--compare thead a { text-decoration: none; }
+.spec--compare thead a:hover { text-decoration: underline; }
+.compare-note { margin-top: var(--s-3); font-size: var(--fs-15); color: var(--screen); max-width: 60ch; }
+
+/* ---------------------------------------------------------------- cable test van */
+.van-hero { padding-top: var(--s-4); padding-bottom: var(--s-2); }
+.van-hero h1 {
+  margin-top: var(--s-2);
+  font-size: clamp(2.375rem, 2.9vw + 1.4rem, var(--fs-64));
+  line-height: 1.04; max-width: 20ch;
+}
+.van-hero__grid { display: grid; gap: var(--s-4); margin-top: var(--s-5); }
+.van-hero__photo img { width: 100%; }
+.van-hero__name .nameplate { display: block; font-size: var(--fs-36); }
+.van-hero__name .product-name { display: block; margin-top: var(--s-1); font-size: var(--fs-15); color: var(--screen); }
+.van-hero__info .product-lede { margin-top: var(--s-3); }
+.van-hero__info .keyfigs { margin-top: var(--s-3); }
+.van-hero__info .btn-row { margin-top: var(--s-4); }
+@media (min-width: 1024px) {
+  .van-hero { padding-top: var(--s-6); }
+  .van-hero__grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); }
+  .van-hero__photo { grid-column: 1 / span 8; }
+  /* nameplate level with the top of the photo, facts and actions level with its foot */
+  .van-hero__info { grid-column: 9 / span 4; display: flex; flex-direction: column; padding-top: var(--s-3); }
+  .van-hero__info .product-lede { margin-top: auto; padding-top: var(--s-4); }
+}
+@media (max-width: 479px) { .van-hero__info .btn-row .btn { flex: 1 1 100%; } }
+
+/* what's on board: compact instrument tiles inside the workflow stations */
+.mini-tiles { margin-top: var(--s-3); display: grid; gap: var(--s-1); }
+.mini-tile {
+  position: relative;
+  display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--s-2);
+  padding: 6px 12px 6px 6px;
+  background: var(--white); border: 1px solid var(--rule);
+  transition: border-color .15s;
+}
+.mini-tile:hover, .mini-tile:focus-within { border-color: var(--semicon); }
+.mini-tile__media { aspect-ratio: 4 / 3; overflow: hidden; }
+.mini-tile__media img, .mini-tile__media svg { width: 100%; height: 100%; object-fit: contain; }
+.mini-tile__model { font-stretch: var(--wd-plate); font-size: var(--fs-18); font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; }
+.mini-tile__model a { text-decoration: none; }
+.mini-tile__model a::after { content: ""; position: absolute; inset: 0; }
+.mini-tile__model a:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.mini-tile__name { margin-top: 2px; font-size: var(--fs-13); color: var(--screen); }
+/* van: equipment named by function (no product link), the family diagram in place of a photo */
+.mini-tile--function:hover, .mini-tile--function:focus-within { border-color: var(--rule); }
+.mini-tile--function .mini-tile__media { display: flex; align-items: center; padding: 0 6px; }
+.mini-tile--function .mini-tile__media svg { height: auto; }
+.mini-tile__name .slot { white-space: normal; }
+.onboard .station__text { margin-top: var(--s-2); max-width: 40ch; }
+.onboard .station__text b { color: var(--semicon); font-weight: 600; }
+.onboard__cabin {
+  margin-top: var(--s-5); padding-top: var(--s-2); border-top: 1px solid var(--rule);
+  font-size: var(--fs-15); color: var(--screen); max-width: 80ch;
+}
+.onboard__cabin b { color: var(--semicon); font-weight: 600; }
+
+/* interior photo with numbered callouts; the numbers map to the legend */
+.callouts { display: grid; gap: var(--s-4); }
+@media (min-width: 1024px) {
+  .callouts { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); align-items: start; }
+  .callouts__figure { grid-column: 1 / span 8; }
+  .callouts__legend { grid-column: 9 / span 4; }
+}
+.callouts__stage { position: relative; }
+.callouts__stage img { width: 100%; }
+.marker, .legend__num {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--semicon); color: var(--white);
+  font-size: var(--fs-13); font-weight: 700; line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  transition: background-color .15s;
+}
+.marker {
+  position: absolute; left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--white);
+  width: 30px; height: 30px;
+}
+.marker.is-lit, .legend li.is-lit .legend__num { background: var(--sheath-deep); }
+/* marker positions on the van interior photo (percent of the photo) */
+.marker[data-callout="1"] { --x: 24.5%; --y: 37%; }
+.marker[data-callout="2"] { --x: 40.5%; --y: 42%; }
+.marker[data-callout="3"] { --x: 53.5%; --y: 42%; }
+.marker[data-callout="4"] { --x: 74.5%; --y: 44.5%; }
+.marker[data-callout="5"] { --x: 72%; --y: 62%; }
+.marker[data-callout="6"] { --x: 70%; --y: 91%; }
+@media (max-width: 599px) { .marker { width: 24px; height: 24px; font-size: 11px; } }
+.legend { border-top: 1px solid var(--semicon); }
+.legend li {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; align-items: start;
+  padding: 12px 0; border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-15);
+}
+.legend b { display: block; font-weight: 600; }
+.legend span.legend__what { color: var(--screen); }
+.legend__note { margin-top: var(--s-2); font-size: var(--fs-13); color: var(--screen); }
+
+/* the HV side, at the rear doors */
+.rear { margin-top: var(--s-8); }
+.rear__head { margin-bottom: var(--s-4); }
+.rear__head .h2 { font-stretch: var(--wd-head); letter-spacing: -0.02em; }
+.rear__head p { margin-top: var(--s-2); max-width: 52ch; }
+
+/* how a call-out works: a true sequence along one cable, the dig spot lit */
+.sequence { display: grid; }
+.sequence li { position: relative; padding: 0 0 var(--s-4) 40px; }
+.sequence li::before {
+  content: ""; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--semicon);
+}
+.sequence li:last-child::before { bottom: auto; height: 18px; }
+.sequence__node {
+  position: absolute; left: 0; top: 4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--semicon);
+}
+.sequence li:last-child .sequence__node { background: var(--sheath); border-color: var(--sheath); }
+.sequence h3 { font-size: var(--fs-18); }
+.sequence__tag { display: block; margin-top: 2px; font-size: var(--fs-13); color: var(--screen); font-stretch: var(--wd-text); }
+.sequence__tag b { color: var(--semicon); font-stretch: var(--wd-plate); font-weight: 700; }
+.sequence p { margin-top: 6px; font-size: var(--fs-15); color: var(--screen); max-width: 34ch; }
+@media (min-width: 900px) {
+  .sequence { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--gutter); row-gap: var(--s-6); }
+  .sequence li { padding: 36px 0 0; }
+  .sequence li::before { left: 0; right: calc(-1 * var(--gutter)); top: 7px; bottom: auto; width: auto; height: 2px; }
+  .sequence li:nth-child(3n)::before, .sequence li:last-child::before { right: 0; height: 2px; }
+  .sequence__node { top: 0; }
+}
+@media (min-width: 1200px) {
+  .sequence { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .sequence li:nth-child(3n)::before { right: calc(-1 * var(--gutter)); }
+  .sequence li:last-child::before { right: 0; }
+}
+
+/* FAQ: native disclosure, hairline rows */
+.faq { border-top: 1px solid var(--semicon); }
+.faq details { border-bottom: 1px solid var(--rule); }
+.faq summary {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3);
+  padding: var(--s-2) 0;
+  font-size: var(--fs-18); font-weight: 600; line-height: 1.35;
+  cursor: pointer; list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: ""; flex: none; width: 14px; height: 14px; margin-top: 4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M7 1v12M1 7h12' stroke='%231F2326' stroke-width='1.6' fill='none'/%3E%3C/svg%3E") no-repeat center;
+  transition: transform .15s;
+}
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq summary:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+.faq__answer { padding-bottom: var(--s-3); max-width: 62ch; color: var(--screen); }
+.faq__answer p + p { margin-top: 0.6em; }
+

@@ -1,0 +1,16 @@
+/* Design preview only (`npm run build:preview`): the notice bar BaseLayout renders above the
+   header when PUBLIC_PREVIEW=1. astro.config.mjs adds this file to every page of the preview
+   build; the production build never loads it. Values come from the tokens. */
+.preview-bar {
+  background: var(--semicon);
+  color: var(--on-dark-muted);
+  font-size: var(--fs-13);
+  line-height: 1.4;
+  text-align: center;
+  padding: 6px var(--margin);
+}
+.preview-bar p { margin: 0; }
+/* In normal flow above the sticky header: it scrolls away and the header sticks at top: 0 as
+   always. The mobile menu sheet is fixed at top: var(--header-h), so the bar steps aside while
+   the sheet is open (the page cannot scroll then), keeping the header right above the sheet. */
+body.menu-open .preview-bar { display: none; }

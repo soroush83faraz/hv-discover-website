@@ -1,0 +1,70 @@
+---
+/**
+ * ARM Filter page, "What arc reflection does" (bespokeSection: 'arc-reflection'): the method
+ * in plain words, two TDR traces (without and during the arc) and the connection schematic.
+ * Port of the method section in design/mockups/product-arm-filter.html.
+ *   <ArcReflection />
+ */
+import Slot from '../Slot.astro';
+---
+<section class="section section--white" aria-labelledby="method-title">
+  <div class="wrap split">
+    <div class="split__head">
+      <h2 id="method-title">What arc reflection does</h2>
+      <p class="muted small">The method in plain words, and where the ARM Filter sits.</p>
+    </div>
+    <div class="split__body">
+      <p class="lead measure">A reflectometer sees open circuits and short circuits clearly. Many real faults are neither: a high-resistance fault reflects almost nothing, so the trace looks like a healthy cable.</p>
+      <div class="traces">
+        <figure class="trace">
+          <svg viewBox="0 0 480 130" role="img" aria-label="Trace without the arc: the launch pulse, an almost flat line past the fault, and a reflection from the open far end of the cable.">
+            <path class="fam-thin" d="M10 112H470M10 108v8M470 108v8M250 108v8"></path>
+            <path class="fam" d="M10 62H14C16 62 17 16 20 16S24 66 28 66L31 62H244C246 62 247 59 250 59S254 62 256 62H438C442 62 444 28 450 28S458 60 470 61"></path>
+            <text class="trace__label" x="10" y="128">0 m</text>
+            <text class="trace__label" x="250" y="128" text-anchor="middle">fault</text>
+            <text class="trace__label" x="470" y="128" text-anchor="end">far end</text>
+            <text class="trace__label" x="250" y="48" text-anchor="middle">hardly visible</text>
+          </svg>
+          <figcaption><b>Low-voltage shot only.</b> The pulse runs past the fault and reflects from the far end.</figcaption>
+        </figure>
+        <figure class="trace">
+          <svg viewBox="0 0 480 130" role="img" aria-label="Trace during the arc: the launch pulse, then a sharp downward reflection at the fault, and nothing beyond it.">
+            <path class="fam-thin" d="M10 112H470M10 108v8M470 108v8M250 108v8"></path>
+            <path class="trace__mark" d="M250 20V108"></path>
+            <path class="fam" d="M10 62H14C16 62 17 16 20 16S24 66 28 66L31 62H242C246 62 247 96 251 96S256 60 262 60L268 63L274 62H470"></path>
+            <circle class="fam-point" cx="251" cy="96" r="4"></circle>
+            <text class="trace__label" x="10" y="128">0 m</text>
+            <text class="trace__label trace__label--hot" x="250" y="128" text-anchor="middle">fault</text>
+            <text class="trace__label" x="470" y="128" text-anchor="end">far end</text>
+            <text class="trace__label trace__label--hot" x="258" y="40">sharp reflection</text>
+          </svg>
+          <figcaption><b>Shot during the arc.</b> The surge makes the fault arc over. For that moment it is a short circuit, and the pulse reflects sharply from it.</figcaption>
+        </figure>
+      </div>
+      <div class="prose measure method__text">
+        <p>The surge generator fires into the cable and the fault flashes over. A pulse sent while it arcs comes back from the fault, not from the far end. Lay the two traces over each other and they part at the fault distance.</p>
+        <p>The ARM Filter makes that timing possible. It joins the TDR-901 to the surge circuit, protecting the reflectometer from the surge while letting its pulse onto the cable.</p>
+      </div>
+      <figure class="schematic">
+        <svg viewBox="0 0 600 220" role="img" aria-labelledby="sch-title">
+          <title id="sch-title">Schematic: the TDR-901 and the surge generator both connect to the ARM Filter, and the ARM Filter connects to the faulty cable.</title>
+          <rect class="schematic__box" x="8" y="20" width="150" height="56"></rect>
+          <text class="schematic__name" x="83" y="47" text-anchor="middle">TDR-901</text>
+          <text class="schematic__note" x="83" y="65" text-anchor="middle">pulses</text>
+          <rect class="schematic__box schematic__box--here" x="225" y="20" width="150" height="56"></rect>
+          <text class="schematic__name" x="300" y="47" text-anchor="middle">ARM Filter</text>
+          <text class="schematic__note" x="300" y="65" text-anchor="middle">joins the two</text>
+          <rect class="schematic__box" x="442" y="20" width="150" height="56"></rect>
+          <text class="schematic__name" x="517" y="47" text-anchor="middle">PG-10 or PG-32</text>
+          <text class="schematic__note" x="517" y="65" text-anchor="middle">surges</text>
+          <path class="fam" d="M158 48H225M375 48H442M300 76V160H592"></path>
+          <path class="fam" d="M498 148V138M489 151l-7-7M507 151l7-7"></path>
+          <circle class="fam-point" cx="498" cy="160" r="4.5"></circle>
+          <text class="schematic__note" x="312" y="152">faulty cable</text>
+          <text class="schematic__note" x="498" y="192" text-anchor="middle">fault, arcing</text>
+        </svg>
+        <figcaption class="figure-caption">In principle, not a wiring diagram. Connection details follow with the datasheet: <Slot /></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>

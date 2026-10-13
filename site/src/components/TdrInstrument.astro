@@ -1,0 +1,58 @@
+---
+/**
+ * The hero instrument (design spec 6.1–6.2): a TDR trace with a readout, an info card for the
+ * cursor and a teaching sentence. One of ten scenarios (src/scripts/tdr/scenarios.ts, all copy
+ * lives there) is shown per visit; the server renders the first one (open circuit) so the page
+ * reads without JavaScript, and src/scripts/tdr.ts replaces it with the chosen scenario.
+ * Sits inside .hero__inner after the hero copy (see src/pages/index.astro).
+ */
+import Button from './Button.astro';
+import { COPY, SCENARIOS, fill, inSentence } from '../scripts/tdr/scenarios';
+
+const first = SCENARIOS[0]!;
+const fmt1 = new Intl.NumberFormat('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const countText = fill(COPY.count, { n: 1, total: SCENARIOS.length, title: inSentence(first.title) });
+const lead = /\b(at|from)$/.test(first.label) ? first.label : first.label + ' at';
+---
+<div class="tdr" data-tdr>
+  <div class="tdr__readout">
+    <div class="readout">
+      <span class="readout__label" data-readout-label aria-hidden="true">{first.label}</span>
+      <span class="readout__value" aria-hidden="true"><span data-readout-value>{fmt1.format(first.main)}</span><span class="unit">m</span></span>
+      <span class="sr-only" data-readout-sr>{countText}. {lead} {fmt1.format(first.main)} {COPY.metres}.</span>
+    </div>
+  </div>
+  <div
+    class="tdr__plot"
+    tabindex="0"
+    role="slider"
+    aria-label="TDR cursor position along the cable"
+    aria-describedby="tdr-teach tdr-desc"
+    aria-valuemin="0"
+    aria-valuemax={first.range}
+    aria-valuenow="0"
+    aria-valuetext="Cursor not placed"
+  >
+  </div>
+  <div class="tdr-card" data-card hidden aria-hidden="true">
+    <p class="tdr-card__head"><b data-c-dist></b><span data-c-time></span></p>
+    <p class="tdr-card__name" data-c-name></p>
+    <p class="tdr-card__coef" data-c-coef></p>
+    <p data-c-seeing></p>
+    <p class="tdr-card__next" data-c-next><b>{COPY.next}</b> <span></span></p>
+    <p class="tdr-card__rel" data-c-rel></p>
+  </div>
+  <div class="tdr__caption">
+    <p class="tdr__count" data-count>{countText}</p>
+    <p class="tdr__teach" id="tdr-teach" data-teach>{first.teach}</p>
+  </div>
+  <div class="tdr__foot">
+    <Button variant="secondary" size="sm" class="tdr__next" data-next>{COPY.another}</Button>
+    <p class="tdr__hint" id="tdr-desc">{COPY.hint} {COPY.velocity}</p>
+  </div>
+  <p class="sr-only" aria-live="polite" data-live></p>
+</div>
+
+<script>
+  import '../scripts/tdr';
+</script>

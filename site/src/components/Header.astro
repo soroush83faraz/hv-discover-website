@@ -1,0 +1,75 @@
+---
+/**
+ * Site header (design spec 5): logo, main nav, Contact, the quote list button with its
+ * count, and the mobile menu sheet below 1100px. The current page is marked with
+ * aria-current="page"; a product page marks Products as its section (class is-current).
+ * Loads the menu and quote-list scripts, so every page gets Add to quote behaviour.
+ */
+import logo from '../assets/brand/logo.svg';
+import { CONTACT_LINK, MAIN_NAV, SITE } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+const isPage = (href: string) => path === href;
+const isSection = (href: string) => path.startsWith(href + '/');
+---
+<header class="site-header">
+  <div class="wrap site-header__bar">
+    <a class="brand" href="/"><img src={logo.src} alt="HV Discover, home" width="108" height="32" /></a>
+    <nav class="nav-main" aria-label="Main">
+      <ul>
+        {
+          MAIN_NAV.map((l) => (
+            <li>
+              <a href={l.href} class:list={{ 'is-current': isSection(l.href) }} aria-current={isPage(l.href) ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <span class="header-sep" aria-hidden="true"></span>
+    <a class="nav-contact" href={CONTACT_LINK.href} aria-current={isPage(CONTACT_LINK.href) ? 'page' : undefined}>{CONTACT_LINK.label}</a>
+    <a
+      class="quote-btn"
+      href="/request-a-quote"
+      aria-current={isPage('/request-a-quote') ? 'page' : undefined}
+      data-quote-link
+      aria-label="Quote 0 items in your list">Quote <span class="quote-btn__count" data-quote-count>0</span></a
+    >
+    <button class="menu-btn" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-sheet"
+      ><span class="menu-btn__icon" aria-hidden="true"></span><span class="menu-btn__label">Menu</span></button
+    >
+  </div>
+  <div class="menu-sheet" id="menu-sheet" hidden>
+    <nav aria-label="Main, mobile">
+      <ul>
+        {
+          [...MAIN_NAV, CONTACT_LINK].map((l) => (
+            <li>
+              <a href={l.href} aria-current={isPage(l.href) ? 'page' : undefined}>
+                {l.label}
+                {l.micro && (
+                  <>
+                    {' '}
+                    <span class="micro">{l.micro}</span>
+                  </>
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <div class="menu-sheet__foot small">
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+      <span class="muted">{SITE.address.join(', ')}</span>
+      <span class="muted">{SITE.hours}</span>
+    </div>
+  </div>
+</header>
+
+<script>
+  import '../scripts/menu';
+  import '../scripts/quote-list';
+</script>

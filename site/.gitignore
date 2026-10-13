@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+_review/
+.DS_Store
+*.log
+.env
+.env.*
+
+# Form API: copied from ../api by scripts/sync-api.mjs (prebuild). ../api is the source of
+# truth; public/api/ (including any config.php or data/ that ends up there) is never committed.
+public/api/
+
+# local preview logs
+_preview.log*

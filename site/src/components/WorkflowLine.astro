@@ -1,0 +1,61 @@
+---
+/**
+ * The workflow line (design spec 5): a 2px graphite cable with the four numbered stations
+ * and the instruments of each step. Hover or focus lights a station's segment.
+ *   <WorkflowLine />                                   Home: text, family diagram, products
+ *   <WorkflowLine variant="compact" current={slug} />  Product page "Where it fits": the
+ *     current product's station is lit and marked "You are here"; other stations link
+ *     their title to /fault-location.
+ * Stations come from src/data/families.ts, products from the products collection.
+ */
+import { WORKFLOW_STEPS } from '../data/families';
+import { getInstruments, productHref } from '../lib/products';
+import FamilyDiagram from './FamilyDiagram.astro';
+
+interface Props {
+  variant?: 'full' | 'compact';
+  /** Slug of the product whose page this is (compact variant). */
+  current?: string;
+}
+const { variant = 'full', current } = Astro.props;
+const instruments = await getInstruments();
+const compact = variant === 'compact';
+const activeStep = compact ? instruments.find((p) => p.data.slug === current)?.data.family : undefined;
+---
+<ol class:list={['stations', { 'stations--compact': compact }]}>
+  {
+    WORKFLOW_STEPS.map((f) => {
+      const active = f.step === activeStep;
+      const products = instruments.filter((p) => p.data.family === f.step);
+      return (
+        <li class:list={['station', { 'is-active': active }]} aria-current={active ? 'step' : undefined}>
+          <span class="station__node" aria-hidden="true" />
+          <span class="station__num" aria-hidden="true">{f.step}</span>
+          <h3>
+            <span class="sr-only">{`Step ${f.step}: `}</span>{compact && !active ? <a href="/fault-location">{f.verb}</a> : f.verb}
+          </h3>
+          {active && <span class="station__here">You are here</span>}
+          {!compact && <p class="station__text">{f.text}</p>}
+          {!compact && <FamilyDiagram step={f.step} class="station__diagram" />}
+          <ul class="station__products">
+            {products.map((p) =>
+              p.data.slug === current ? (
+                <li>
+                  <span class="station__product">
+                    <span class="station__model">{p.data.model}</span> <span class="station__pname">{p.data.name}</span>
+                  </span>
+                </li>
+              ) : (
+                <li>
+                  <a href={productHref(p)}>
+                    <span class="station__model">{p.data.model}</span> <span class="station__pname">{p.data.name}</span>
+                  </a>
+                </li>
+              ),
+            )}
+          </ul>
+        </li>
+      );
+    })
+  }
+</ol>

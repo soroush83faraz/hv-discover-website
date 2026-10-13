@@ -1,0 +1,34 @@
+---
+/**
+ * Key figures beside the nameplate on a product page (dl.keyfigs): four large figures,
+ * or four text facts when the product has `keyFiguresLayout: text`.
+ *   <KeyFigures product={product} />
+ */
+import type { Product } from '../lib/products';
+import Slot from './Slot.astro';
+
+interface Props {
+  product: Product;
+}
+const { product } = Astro.props;
+const { keyFigures, keyFiguresLayout } = product.data;
+---
+<dl class={keyFiguresLayout === 'text' ? 'keyfigs keyfigs--text' : 'keyfigs'}>
+  {
+    keyFigures.map((f) => (
+      <div>
+        <dt>{f.label}</dt>
+        {/* value and unit on one line: no space between them (the unit has its own margin) */}
+        <dd>
+          {f.value}{f.unit && <span class="unit">{f.unit}</span>}
+          {f.slot && (
+            <>
+              {f.value && ' '}
+              <Slot text={f.slot} />
+            </>
+          )}
+        </dd>
+      </div>
+    ))
+  }
+</dl>

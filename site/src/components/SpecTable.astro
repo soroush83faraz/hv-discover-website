@@ -1,0 +1,47 @@
+---
+/**
+ * Grouped specification tables (design spec 5): group heading, then label | value rows
+ * with the unit in grey and hairline rules. Values use the inline syntax of
+ * src/lib/inline.ts ({unit}, ~nowrap~, [link](/url)); unconfirmed facts render as Slot.
+ *   <SpecTable groups={product.data.specs} />
+ */
+import type { Product } from '../lib/products';
+import { inline } from '../lib/inline';
+import Slot from './Slot.astro';
+
+interface Props {
+  groups: Product['data']['specs'];
+}
+const { groups } = Astro.props;
+---
+{
+  groups.map((g) => (
+    <div class="spec-group">
+      <h3>{g.group}</h3>
+      <table class="spec">
+        <tbody>
+          {g.rows.map((r) => (
+            <tr>
+              <th scope="row">{r.label}</th>
+              <td>
+                <Fragment set:html={inline(r.value)} />
+                {r.unit && (
+                  <>
+                    {' '}
+                    <span class="unit">{r.unit}</span>
+                  </>
+                )}
+                {r.slot && (
+                  <>
+                    {r.value && ' '}
+                    <Slot text={r.slot} />
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ))
+}

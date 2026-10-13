@@ -1,0 +1,53 @@
+---
+/**
+ * 404: port of design/mockups/404.html (pages-b.css): graticule head with a TDR trace that
+ * shows no reflection (wide and narrow SVG variants), and links to Home, Products, Contact.
+ * Kept out of the sitemap (astro.config.mjs) and out of search results (noindex).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import '../styles/pages-b.css';
+---
+<BaseLayout
+  title="Page not found | HV Discover"
+  description="This page does not exist on hvdiscover.com. Go to the products, the fault location method or the contact page."
+  noindex
+>
+  <section class="hero hero--page nf" aria-labelledby="page-title">
+    <div class="wrap hero__inner">
+      <p class="nf__code">Error 404</p>
+      <h1 class="page-title" id="page-title">No reflection at this address.</h1>
+      <p class="page-head__sub">We sent a pulse down this link and nothing came back. The page may have moved when the site was rebuilt, or the address has a typo.</p>
+
+      <figure class="nf__trace">
+        <svg class="diagram dg-wide" viewBox="0 0 960 170" role="img" aria-label="A TDR trace: the launch pulse at 0 metres, then a flat line to the end of the range with no reflection.">
+          <path class="dg-thin" d="M0 140H952"/>
+          <path class="dg-grey" d="M0.5 140V148M238 140V145M476 140V145M714 140V145M951.5 140V148"/>
+          <text class="dg-text dg-text--sm" x="0" y="166">0 m</text>
+          <text class="dg-text dg-text--sm" x="952" y="166" text-anchor="end">404 m</text>
+          <path class="dg-line-2" d="M0 118H8C12 118 14 34 20 34S28 126 36 124L42 118L48 117.6L54 119.7L60 117.8L66 118.5L72 118.5L78 118.8L84 117.9L90 119.0L96 116.2L102 119.1L108 116.5L114 117.6L120 117.1L126 117.7L132 117.1L138 119.2L144 118.3L150 117.8L156 116.2L162 119.5L168 118.8L174 119.5L180 116.8L186 117.0L192 117.8L198 118.9L204 116.6L210 118.0L216 118.5L222 118.1L228 118.8L234 118.7L240 118.2L246 117.5L252 118.1L258 117.7L264 118.6L270 117.2L276 119.5L282 118.9L288 116.9L294 118.0L300 118.6L306 118.6L312 116.6L318 119.0L324 117.9L330 117.0L336 118.4L342 118.2L348 119.1L354 118.1L360 117.3L366 117.2L372 117.4L378 118.7L384 117.5L390 118.2L396 117.9L402 116.9L408 118.2L414 118.2L420 119.4L426 117.1L432 118.3L438 117.1L444 119.1L450 117.8L456 118.6L462 116.9L468 117.6L474 119.3L480 118.5L486 116.8L492 118.2L498 118.3L504 119.2L510 118.8L516 116.9L522 117.8L528 118.7L534 117.8L540 117.3L546 118.1L552 118.0L558 119.0L564 117.8L570 117.2L576 117.4L582 118.5L588 116.8L594 118.5L600 119.1L606 116.7L612 118.6L618 117.9L624 119.1L630 117.1L636 118.7L642 118.2L648 118.3L654 118.6L660 118.1L666 117.6L672 119.2L678 117.1L684 117.7L690 119.2L696 117.4L702 119.2L708 117.2L714 117.3L720 118.1L726 116.8L732 117.1L738 117.1L744 118.3L750 117.4L756 116.8L762 118.5L768 117.2L774 117.5L780 117.3L786 118.2L792 118.7L798 118.4L804 119.1L810 117.6L816 118.8L822 117.0L828 117.4L834 118.9L840 118.1L846 119.0L852 117.1L858 117.9L864 119.1L870 118.8L876 118.6L882 117.7L888 117.8L894 118.9L900 117.4L906 117.6L912 118.3L918 118.3L924 119.1L930 119.0L936 117.3L942 117.3L948 117.9L952 118.6"/>
+          <text class="dg-text dg-text--sm" x="32" y="44">Launch pulse</text>
+          <path class="dg-dash" d="M952 20V140"/>
+          <text class="dg-text dg-text--sm" x="940" y="96" text-anchor="end">No reflection</text>
+        </svg>
+        <svg class="diagram dg-narrow" viewBox="0 0 360 170" role="img" aria-label="A TDR trace: the launch pulse at 0 metres, then a flat line to the end of the range with no reflection.">
+          <path class="dg-thin" d="M0 140H352"/>
+          <path class="dg-grey" d="M0.5 140V148M88 140V145M176 140V145M264 140V145M351.5 140V148"/>
+          <text class="dg-text dg-text--sm" x="0" y="166">0 m</text>
+          <text class="dg-text dg-text--sm" x="352" y="166" text-anchor="end">404 m</text>
+          <path class="dg-line-2" d="M0 118H8C12 118 14 34 20 34S28 126 36 124L42 118L47 117.6L52 116.8L57 117.9L62 116.3L67 116.7L72 117.3L77 116.8L82 119.7L87 119.0L92 116.3L97 119.1L102 116.1L107 119.5L112 116.2L117 118.6L122 117.5L127 116.7L132 116.9L137 118.2L142 116.4L147 117.5L152 116.3L157 116.2L162 118.1L167 118.7L172 118.6L177 116.3L182 119.4L187 119.5L192 119.7L197 119.7L202 118.2L207 119.6L212 116.3L217 117.9L222 116.9L227 118.5L232 118.6L237 116.7L242 117.4L247 116.4L252 117.7L257 118.8L262 118.7L267 117.2L272 119.0L277 118.6L282 119.0L287 117.9L292 119.2L297 118.6L302 117.6L307 119.4L312 119.2L317 119.2L322 118.8L327 117.4L332 119.0L337 116.6L342 117.0L347 119.3L352 117.6"/>
+          <text class="dg-text dg-text--sm" x="32" y="44">Launch pulse</text>
+          <path class="dg-dash" d="M352 20V140"/>
+          <text class="dg-text dg-text--sm" x="340" y="96" text-anchor="end">No reflection</text>
+        </svg>
+      </figure>
+
+      <div class="btn-row nf__links">
+        <Button href="/">Home</Button>
+        <Button variant="secondary" href="/products">Products</Button>
+        <Button variant="secondary" href="/contact">Contact</Button>
+      </div>
+      <p class="nf__more">Looking for the method? <a href="/fault-location">How cable fault location works</a>.</p>
+    </div>
+  </section>
+</BaseLayout>

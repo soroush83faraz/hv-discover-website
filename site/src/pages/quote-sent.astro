@@ -1,0 +1,93 @@
+---
+/**
+ * Quote request sent: port of design/mockups/quote-sent.html (pages-b.css).
+ * src/scripts/quote.ts fills in the reference (from ?ref= or the summary the quote page
+ * left in sessionStorage), the reply address and "What you sent". The reference block
+ * stays hidden when there is no reference to show. Not indexed, not in the sitemap.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import QuoteCatalog from '../components/QuoteCatalog.astro';
+import Slot from '../components/Slot.astro';
+import '../styles/pages-b.css';
+---
+<BaseLayout
+  title="Quote request sent | HV Discover"
+  description="Your quote request has reached HV Discover. Keep the reference for any email about it; we reply with a priced offer."
+  noindex
+>
+  <div data-quote-sent>
+    <section class="wrap page-head" aria-labelledby="page-title">
+      <div class="sent">
+        <div class="sent__copy">
+          <h1 class="page-title" id="page-title">Quote request sent</h1>
+          <p class="page-head__sub">Thank you. Your request has reached us.<span data-reply-wrap hidden> We will reply to <b class="nowrap" data-reply-to></b>.</span></p>
+        </div>
+        <div class="sent__ref" data-ref-wrap hidden>
+          <div class="readout">
+            <span class="readout__label">Your reference</span>
+            <span class="readout__value" data-ref></span>
+          </div>
+          <p class="micro">Quote it in any email about this request.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--white" aria-labelledby="next-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="next-title">What happens next</h2>
+          <p class="lead">Expect a first reply within <Slot text="reply time" />, by email from info@hvdiscover.com.</p>
+        </div>
+        <ol class="stations stations--3 stations--plain">
+          <li class="station is-done">
+            <span class="station__node" aria-hidden="true"></span>
+            <h3>Request received</h3>
+            <span class="station__state">Done</span>
+            <p class="station__text">Your list, quantities and cable details are with us under your reference.</p>
+          </li>
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <h3>We check it</h3>
+            <span class="station__state">Next</span>
+            <p class="station__text">We match the kit to your cable. If the voltage, length or fault type is unclear, we ask first.</p>
+          </li>
+          <li class="station">
+            <span class="station__node" aria-hidden="true"></span>
+            <h3>You get a priced offer</h3>
+            <span class="station__state">Then</span>
+            <p class="station__text">By email, with the instruments, quantities and the options we recommend, such as training.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="sum-title" data-summary-wrap hidden>
+      <div class="wrap split">
+        <div class="split__head">
+          <h2 id="sum-title">What you sent</h2>
+          <p class="muted small">A copy for your records. Reference <span data-ref></span>.</p>
+        </div>
+        <div class="split__body--narrow">
+          <ul class="sent-summary" data-summary></ul>
+        </div>
+      </div>
+    </section>
+
+    <QuoteBand
+      heading="While you wait"
+      lead="See how the instruments work together, or keep browsing." id="more-title"
+    >
+      <div class="btn-row" slot="actions">
+        <Button variant="secondary" href="/fault-location">How fault location works</Button>
+        <Button variant="secondary" href="/products">Back to products</Button>
+      </div>
+    </QuoteBand>
+  </div>
+  <QuoteCatalog />
+</BaseLayout>
+
+<script>
+  import '../scripts/quote';
+</script>

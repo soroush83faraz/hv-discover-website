@@ -1,0 +1,55 @@
+---
+/**
+ * Technical line drawing that stands in for a missing product photo (PG-10, CRT-015).
+ * Fills its container (a 4:3 tile media box or the gallery stage).
+ *   <PlaceholderDrawing type="pg-10" label={product.data.drawingAlt} />
+ */
+interface Props {
+  type: 'pg-10' | 'crt-015';
+  /** Accessible description of the drawing. */
+  label?: string | undefined;
+  /** Visible caption, bottom left. Pass "" for none (the van page's mini tiles). */
+  caption?: string;
+}
+const DEFAULT_LABELS = {
+  'pg-10': 'Placeholder line drawing of a surge generator case. The PG-10 photo is coming soon.',
+  'crt-015':
+    'Placeholder line drawing of a route tracer set: a long hand-held receiver and a portable transmitter. The CRT-015 photo is coming soon.',
+};
+const { type, label, caption = 'Photo coming soon' } = Astro.props;
+---
+<div class="drawing" role="img" aria-label={label ?? DEFAULT_LABELS[type]}>
+  {
+    type === 'pg-10' ? (
+      <svg viewBox="0 0 400 300" aria-hidden="true">
+        <path class="ln" d="M132 96h152v150H132zM284 96l42-22v146l-42 26M132 96l42-22h152" />
+        <path class="ln-thin" d="M142 106h132v130H142z" />
+        <path class="ln" d="M160 85v-14h52v14M160 71h52M240 82v-14h52v12M240 68h52" />
+        <path class="ln" d="M184 116h48v16h-48z" />
+        <circle class="ln" cx="208" cy="168" r="20" />
+        <path class="ln" d="M196 174l18-14M190 168h4M222 168h4M208 150v4" />
+        <circle class="ln" cx="160" cy="218" r="5" />
+        <circle class="ln" cx="178" cy="218" r="5" />
+        <circle class="ln" cx="250" cy="216" r="10" />
+        <path class="ln" d="M298 130v40l14-7v-40z" />
+        <circle class="pt" cx="226" cy="218" r="4" />
+      </svg>
+    ) : (
+      <svg viewBox="0 0 400 300" aria-hidden="true">
+        <path class="ln" d="M96 238l92-168 14 8-92 168z" />
+        <path class="ln" d="M176 92l34 18-12 22-34-18z" />
+        <path class="ln-thin" d="M180 100l22 12-6 11-22-12z" />
+        <path class="ln" d="M196 66l12-22 20 11-12 22" />
+        <path class="ln" d="M232 156h104v80H232z" />
+        <path class="ln" d="M256 156v-22c0-8 6-14 14-14h28c8 0 14 6 14 14v22" />
+        <path class="ln" d="M246 170h44v28h-44z" />
+        <circle class="ln" cx="314" cy="184" r="8" />
+        <path class="ln" d="M306 184h-4M326 184h-4M314 172v4M314 196v-4" />
+        <path class="ln-thin" d="M246 214h76M246 224h76" />
+        <path class="ln" d="M110 246c-6 6-14 8-22 4" />
+        <circle class="pt" cx="102" cy="246" r="4" />
+      </svg>
+    )
+  }
+  {caption && <span class="drawing__caption">{caption}</span>}
+</div>

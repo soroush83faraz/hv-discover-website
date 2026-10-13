@@ -1,0 +1,151 @@
+---
+/**
+ * Support: port of design/mockups/support.html (pages-b.css).
+ * What support covers, how to request service, the FAQ and the closing band.
+ * FAQPage JSON-LD lists only the questions whose answers are confirmed; questions answered
+ * with a slot stay on the page but out of the structured data until they are filled.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import QuoteBand from '../components/QuoteBand.astro';
+import Slot from '../components/Slot.astro';
+import { SITE } from '../data/site';
+import { breadcrumbs, faqPage } from '../lib/structured-data';
+import '../styles/pages-b.css';
+
+const faq = faqPage([
+  {
+    q: 'Do the instruments come with a calibration certificate?',
+    a: 'Yes. The TDR-901, PG-32 and AP-01 datasheets list a calibration approval and certificate with each instrument.',
+  },
+  {
+    q: 'Can you help me read a trace?',
+    a: 'Yes. Send a screenshot of the trace with the cable type, its length and the v/2 setting you used. We reply by email. For how a trace is read, see <a href="https://hvdiscover.com/fault-location#step-1">pre-location on the fault location page</a>.',
+  },
+  {
+    q: 'Which spare parts can I order?',
+    a: 'Test leads, clamps, earth rods, filters and carrying cases. Order by model number, and give the serial number from the rating plate.',
+  },
+]);
+---
+<BaseLayout
+  title="Support | HV Discover"
+  description="Training, calibration, spare parts and remote help for HV Discover cable fault location instruments, and how to request service."
+  jsonLd={[breadcrumbs([{ name: 'Support', path: '/support' }]), faq]}
+>
+  <div class="wrap page-head">
+    <h1 class="page-title">Support</h1>
+    <p class="page-head__sub">Training, calibration, spare parts and remote help for every HV Discover instrument.</p>
+    <div class="btn-row">
+      <Button href={`mailto:${SITE.email}?subject=Service%20request`}>Request service</Button>
+      <Button variant="secondary" href="#faq">Common questions</Button>
+    </div>
+  </div>
+
+  <!-- what we cover -->
+  <section class="section section--white" aria-labelledby="cover-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="cover-title">What support covers</h2>
+        <p class="lead">Four things keep an instrument useful after delivery. Ask for any of them by model number.</p>
+      </div>
+      <div class="support-cols">
+        <div class="support-col">
+          <h3>Training</h3>
+          <p>Operator training on each instrument and on the whole sequence, from the first pulse to the dig spot. Ask for it with your quote.</p>
+          <p class="small">Format and location: <Slot text="training format" /></p>
+        </div>
+        <div class="support-col">
+          <h3>Calibration</h3>
+          <p>Instruments ship with a calibration certificate. Recalibration and checks are arranged through support.</p>
+          <p class="small">Interval: <Slot text="recalibration interval" /></p>
+        </div>
+        <div class="support-col">
+          <h3>Spare parts</h3>
+          <p>Test leads, clamps, earth rods, filters and carrying cases. Give the model and the serial number from the rating plate.</p>
+        </div>
+        <div class="support-col">
+          <h3>Remote help</h3>
+          <p>Send a screenshot of the trace or a description of the fault. We reply by email.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- how to request service -->
+  <section class="section" id="service" aria-labelledby="service-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="service-title">How to request service</h2>
+        <p class="lead">One email starts it. The more we know about the instrument and the fault, the faster the answer.</p>
+      </div>
+      <ol class="stations stations--3 stations--plain">
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <h3>Email us</h3>
+          <p class="station__text">Write to info@hvdiscover.com with the model, the serial number from the rating plate and what happened. A trace screenshot or a photo helps.</p>
+        </li>
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <h3>We reply</h3>
+          <p class="station__text">Within <Slot text="reply time" />, with a fix to try, a remote session, or the next step.</p>
+        </li>
+        <li class="station">
+          <span class="station__node" aria-hidden="true"></span>
+          <h3>Repair or return</h3>
+          <p class="station__text">If the instrument has to come in, we agree the return or a site visit with you. <Slot text="return logistics" /></p>
+        </li>
+      </ol>
+      <div class="btn-row band-cta">
+        <Button href={`mailto:${SITE.email}?subject=Service%20request`}>Email a service request</Button>
+        <Button variant="secondary" href="/contact">Use the contact form</Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section--white" id="faq" aria-labelledby="faq-title">
+    <div class="wrap split">
+      <div class="split__head">
+        <h2 id="faq-title">Common questions</h2>
+        <p class="muted small">Not here? Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+      </div>
+      <div class="split__body--narrow faq">
+        <details>
+          <summary>Do the instruments come with a calibration certificate?</summary>
+          <div class="faq__a"><p>Yes. The TDR-901, PG-32 and AP-01 datasheets list a calibration approval and certificate with each instrument.</p></div>
+        </details>
+        <details>
+          <summary>How often should an instrument be recalibrated?</summary>
+          <div class="faq__a"><p><Slot text="recalibration interval" />. Ask support when your certificate is due and we arrange the check.</p></div>
+        </details>
+        <details>
+          <summary>Can you help me read a trace?</summary>
+          <div class="faq__a"><p>Yes. Send a screenshot of the trace with the cable type, its length and the v/2 setting you used. We reply by email.</p><p>For how a trace is read, see <a href="/fault-location#step-1">pre-location on the fault location page</a>.</p></div>
+        </details>
+        <details>
+          <summary>Which spare parts can I order?</summary>
+          <div class="faq__a"><p>Test leads, clamps, earth rods, filters and carrying cases. Order by model number, and give the serial number from the rating plate.</p></div>
+        </details>
+        <details>
+          <summary>Are the manuals available in English?</summary>
+          <div class="faq__a"><p>The manuals are written in English. Availability for each instrument: <Slot text="English manual availability" />. Ask for the manual you need by model number.</p></div>
+        </details>
+        <details>
+          <summary>Do you train crews on site?</summary>
+          <div class="faq__a"><p><Slot text="on-site training availability" />. Ask for training with your quote and say how many operators need it.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- band -->
+  <QuoteBand
+    heading="A fault you can’t find?"
+    lead="Describe the cable and what the instruments show. We will tell you what to try next."
+  >
+    <div class="btn-row" slot="actions">
+      <Button href="/contact">Contact us</Button>
+    </div>
+  </QuoteBand>
+</BaseLayout>

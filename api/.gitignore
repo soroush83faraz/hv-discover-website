@@ -1,0 +1,3 @@
+# Real configuration (holds the secret and SMTP password) and runtime data never go in git.
+config.php
+data/

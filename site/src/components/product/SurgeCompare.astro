@@ -1,0 +1,46 @@
+---
+/**
+ * PG-10 page, "PG-10 or PG-32?" (bespokeSection: 'surge-compare'): the two surge generators
+ * side by side, on the .spec table style. Port of the compare section in
+ * design/mockups/product-pg-10.html. The rows summarise both products' specs in the
+ * collection; keep them in step when a spec changes.
+ *   <SurgeCompare />
+ */
+import Slot from '../Slot.astro';
+import { getProduct, productHref } from '../../lib/products';
+import { escapeHtml } from '../../lib/inline';
+
+const pg10 = await getProduct('pg-10-surge-generator');
+const pg32 = await getProduct('pg-32-surge-generator');
+// The link is rendered as HTML: an <a> with expressions inside a <table> trips the Astro
+// compiler, which then repeats the <a> around the content after the table.
+const pg32Link = `<a href="${escapeHtml(productHref(pg32))}">${escapeHtml(pg32.data.model)}</a>`;
+---
+<section class="section section--white" aria-labelledby="compare-title">
+  <div class="wrap split">
+    <div class="split__head">
+      <h2 id="compare-title"><span class="nowrap">{pg10.data.model}</span> or <span class="nowrap">{pg32.data.model}?</span></h2>
+      <p class="muted small">The two surge generators side by side.</p>
+    </div>
+    <div class="split__body">
+      <table class="spec spec--compare">
+        <thead>
+          <tr>
+            <th scope="col"><span class="sr-only">Specification</span></th>
+            <th scope="col">{pg10.data.model}</th>
+            <th scope="col"><Fragment set:html={pg32Link} /></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Output voltage</th><td>Up to 10 <span class="unit">kV</span>, 5 and 10 <span class="unit">kV</span> ranges</td><td>0 to 30 <span class="unit">kV</span></td></tr>
+          <tr><th scope="row">Surge energy</th><td>1,000 <span class="unit">J</span></td><td>1,800 <span class="unit">J</span></td></tr>
+          <tr><th scope="row">DC test voltage</th><td>Up to 10 <span class="unit">kV</span></td><td>0 to 30 <span class="unit">kV</span></td></tr>
+          <tr><th scope="row">Shots</th><td>Single, intervals or a set sequence</td><td>Single, or automatic every 5 <span class="unit">s</span></td></tr>
+          <tr><th scope="row">Display</th><td>Colour LCD touch screen</td><td>Pointer voltmeter and LED display</td></tr>
+          <tr><th scope="row">Weight</th><td><Slot /></td><td>45 <span class="unit">kg</span></td></tr>
+        </tbody>
+      </table>
+      <p class="compare-note">Choose by the cable voltage and the energy the fault needs. Not sure? Add both to the quote list and say so in your request.</p>
+    </div>
+  </div>
+</section>
