@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import cspHashes from './scripts/csp-hashes.mjs';
 import noPlaceholders from './scripts/no-placeholders.mjs';
+import siteVariant from './scripts/site-host.mjs';
 
 // Design preview build (`npm run build:preview`, scripts/build-preview.mjs sets PUBLIC_PREVIEW=1):
 // every page also loads src/styles/preview.css (the notice bar BaseLayout renders in that build).
@@ -33,6 +34,10 @@ const previewStyles = {
 //   handlers, style attributes or javascript: URLs.
 // - scripts/no-placeholders.mjs fails the build when a Slot placeholder ("[to confirm]") is left
 //   in dist/ (HVD_ALLOW_PLACEHOLDERS lists pages allowed to keep them in a draft build).
+// - Staging build (`npm run build:staging`, scripts/build-staging.mjs): HVD_SITE_HOST and HVD_NOINDEX=1
+//   change only the server files (dist/.htaccess, robots.txt, no sitemaps), through cspHashes and
+//   scripts/site-host.mjs. `site` stays https://hvdiscover.com: the staging pages are the production
+//   pages, canonical tags included. With both variables unset the build is unchanged.
 export default defineConfig({
   site: 'https://hvdiscover.com',
   output: 'static',
@@ -54,6 +59,7 @@ export default defineConfig({
       filter: (page) => !page.includes('/quote-sent') && !page.endsWith('/404'),
     }),
     cspHashes(),
+    siteVariant(),
     noPlaceholders(),
     ...(PREVIEW ? [previewStyles] : []),
   ],

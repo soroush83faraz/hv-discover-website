@@ -18,13 +18,15 @@ export const SITE = {
   /** ISO 3166-1 code for JSON-LD addressCountry. */
   countryCode: 'GB',
   /**
-   * PLACEHOLDER address and hours chosen by the assistant at the owner's request on 2026-10-12.
-   * Not a real address. Replace before launch.
-   * This is the one place they live: the footer, contact, about and privacy pages and the
-   * mobile menu all read these two constants.
+   * PLACEHOLDERS chosen by the assistant at the owner's request (address and hours 2026-10-12,
+   * phone 2026-10-18). Not real. Replace with the real details when they are known.
+   * The phone is in the range Ofcom reserves for drama (020 7946 0000 to 0999): it never rings
+   * a real subscriber. This is the one place they live: the footer, contact, about and privacy
+   * pages and the mobile menu read these constants.
    */
   address: ['Unit 4, Meridian Works', 'Hackney Road', 'London E2, United Kingdom'],
   hours: 'Monday to Friday, 09:00 to 17:30, UK time',
+  phone: '+44 20 7946 0958',
   tagline:
     'Cable fault location instruments, from the first pulse to the dig spot, and the van that carries them.',
 } as const;

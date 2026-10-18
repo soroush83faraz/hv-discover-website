@@ -18,6 +18,7 @@ npm run check     # astro check (types in .astro and .ts)
 npm run check:placeholders   # the placeholder check alone, on an existing dist/ (see "No placeholders")
 npm run sync-api  # copy ../api into public/api/ without building
 npm run build:preview   # design preview for GitHub Pages in dist/ (see "Design preview")
+npm run build:staging   # staging copy for staging.hvdiscover.com in dist/ (see "Staging build")
 ```
 
 `npm run build` and `npm run check` must both finish with no errors and no warnings.
@@ -42,6 +43,28 @@ project site, e.g. `https://<user>.github.io/hv-discover-website/`). `scripts/bu
 
 The production build is not affected: with `PUBLIC_PREVIEW` unset, `npm run build` gives the same `dist/`
 byte for byte. Never upload a preview `dist/` to the Apache host.
+
+## Staging build (`npm run build:staging`)
+
+A test copy for the real Apache/PHP host, served from a subdomain (default `staging.hvdiscover.com`,
+document root `public_html/staging/`) while the old site stays live. Another name:
+`HVD_SITE_HOST=test.hvdiscover.com npm run build:staging` (PowerShell: `$env:HVD_SITE_HOST = "…"` first).
+`scripts/build-staging.mjs` runs the normal build with `HVD_SITE_HOST` and `HVD_NOINDEX=1`
+(`scripts/site-host.mjs`). Only the server files differ from production; the pages are byte-identical,
+canonical tags and structured data included (they keep `https://hvdiscover.com`):
+
+- `dist/.htaccess`: the template's `__SITE_HOST__` / `__SITE_HOST_RE__` placeholders get the staging host
+  (canonical host, www/HTTPS redirect, old WordPress redirects, the subdomain-folder gate 6.3); no
+  `Strict-Transport-Security`; `Header always set X-Robots-Tag "noindex, nofollow"`; rule 6.8s points
+  the API to `<domain folder>/hvd-private/config.php`, two levels above the staging document root
+  (the API's own lookup would land inside `public_html`);
+- `robots.txt` is `User-agent: *` / `Disallow: /`; the sitemap files are removed.
+
+The build fails if a placeholder, a literal `hvdiscover.com` (in a directive of `.htaccess` or in
+`robots.txt`), HSTS or a sitemap is left. With both variables unset, `npm run build` is unchanged byte for
+byte. Check the rules with `python -I ../tools/test_htaccess_rules.py --host staging.hvdiscover.com`.
+**Never upload a staging `dist/` to `public_html`**: its `.htaccess` sends every production visitor to the
+staging host. The owner's step-by-step go-live guide is kept with the private project notes, outside this repository (production first; staging is its optional appendix).
 
 ## Form API (`public/api/`, generated)
 
@@ -84,7 +107,8 @@ Pages to build (docs/05-decisions.md): `/`, `/fault-location`, `/products`, `/pr
 
 The DirectAdmin host runs Apache 2.4 (it may run LiteSpeed, which reads the same file).
 `public/.htaccess` is a **template**: the build copies it to `dist/.htaccess` and
-`scripts/csp-hashes.mjs` fills in the Content-Security-Policy hashes there. **Upload `dist/.htaccess`,
+`scripts/csp-hashes.mjs` fills in the Content-Security-Policy hashes and the host (`__SITE_HOST__`,
+`__SITE_HOST_RE__`: `hvdiscover.com` unless `HVD_SITE_HOST` is set, see "Staging build"). **Upload `dist/.htaccess`,
 never `public/.htaccess`.** Sections:
 
 1. basics: no directory listings, `index.html`, the site's 404 page for 403/404/410;

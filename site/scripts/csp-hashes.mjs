@@ -13,6 +13,9 @@
  * without 'unsafe-inline': inline event handlers (onclick=…), javascript: URLs, style="…"
  * attributes, scripts or stylesheets from another origin, frames, objects or media elements.
  *
+ * It also fills the host placeholders __SITE_HOST__ / __SITE_HOST_RE__ with HVD_SITE_HOST (default
+ * hvdiscover.com, scripts/site-host.mjs), which is also the origin counted as "self" below.
+ *
  * Runs from astro.config.mjs (astro:build:done) on every `astro build`; can also be run by hand:
  *   node scripts/csp-hashes.mjs [distDir] [publicDir]
  */
@@ -20,8 +23,10 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fillHost, siteHost } from './site-host.mjs';
 
-const SITE_ORIGIN = 'https://hvdiscover.com';
+const SITE_HOST = siteHost();
+const SITE_ORIGIN = `https://${SITE_HOST}`;
 const SCRIPT_TOKEN = '__INLINE_SCRIPT_HASHES__';
 const STYLE_TOKEN = '__INLINE_STYLE_HASHES__';
 
@@ -160,7 +165,7 @@ function htmlFiles(dir) {
 
 /**
  * Hashes the inline scripts/styles of every page in distDir and writes distDir/.htaccess from
- * publicDir/.htaccess with the placeholders filled in. Returns the final policy.
+ * publicDir/.htaccess with the placeholders (hashes and host) filled in. Returns the final policy.
  */
 export function applyCsp(distDir, publicDir, log = console) {
   const template = path.join(publicDir, '.htaccess');
@@ -198,7 +203,9 @@ export function applyCsp(distDir, publicDir, log = console) {
   }
   if (/__INLINE_[A-Z]+_HASHES__/.test(line)) throw new Error('[csp] a placeholder was left in the CSP line');
   lines[at] = line;
-  fs.writeFileSync(target, lines.join('\n'));
+  const out = fillHost(lines.join('\n'), SITE_HOST);
+  if (/__SITE_HOST/.test(out)) throw new Error('[csp] a __SITE_HOST placeholder was left in .htaccess');
+  fs.writeFileSync(target, out);
 
   const policy = /Content-Security-Policy\s+"([^"]+)"/.exec(line)?.[1] ?? '(not found)';
   log.info?.(`[csp] ${pages.length} pages: ${scripts.length} inline scripts (${scriptHashes.length} distinct), ${styles.length} <style> blocks (${styleHashes.length} distinct)`);

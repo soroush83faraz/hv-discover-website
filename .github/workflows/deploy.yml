@@ -1,0 +1,204 @@
+# Builds the production site and deploys it to the live host (hvdiscover.com) over FTPS.
+# README "Deployment" explains it; .github/scripts/deploy.sh holds the upload logic and its guards,
+# .github/scripts/smoke.sh the checks of the live site.
+#
+# - A push to main deploys that commit. Run it by hand (Actions > Deploy to hvdiscover.com >
+#   Run workflow) to deploy another version: rollback = an earlier commit SHA of main as `ref`.
+#   `dry_run` builds, connects read-only and prints the plan without writing anything.
+# - Three jobs. Only "deploy" can read the FTP secrets (GitHub environment `production`), and it
+#   runs only this workflow's own scripts: it never checks out or runs code of the version being
+#   deployed (that is built in "build", which has no secrets, and handed over as an artifact).
+# - No pull_request or pull_request_target trigger: code from forks never runs here and never
+#   reaches the secrets. Restrict the environment `production` to the branch main as well.
+name: Deploy to hvdiscover.com
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Version to deploy: a full commit SHA, tag or branch that is part of main. Empty = the head of main. Rollback = an earlier commit SHA.'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'Dry run: build, check, connect read-only and show the plan; write nothing to the server'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+# One run at a time, never cancelled half way: a newer run waits for the current one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Build and check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      commit: ${{ steps.source.outputs.commit }}
+    steps:
+      - name: Check the inputs
+        env:
+          INPUT_REF: ${{ inputs.ref }}
+        run: |
+          if [[ -n "$INPUT_REF" && ! "$INPUT_REF" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]{0,127}$ ]]; then
+            echo "::error title=Invalid ref::The ref input may only hold letters, digits and . _ / - (a commit SHA, a tag or a branch name)."
+            exit 1
+          fi
+
+      - name: Check out the version to deploy
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Only deploy versions that are part of main
+        id: source
+        run: |
+          commit=$(git rev-parse --verify 'HEAD^{commit}')
+          if ! git merge-base --is-ancestor "$commit" origin/main; then
+            echo "::error title=Not on main::Commit $commit is not part of main. Only versions that are on main can be deployed: merge it first."
+            exit 1
+          fi
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "Deploying commit $commit ($(git log -1 --format='%cs %s' "$commit"))"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        working-directory: site
+        run: npm ci --no-audit --no-fund
+
+      # The production build: copies ../api into dist/api, fills the CSP hashes into dist/.htaccess
+      # and fails on placeholders or anything the CSP would block. The variables of the staging and
+      # preview builds are emptied, so this can only be the production build.
+      - name: Production build
+        working-directory: site
+        env:
+          HVD_SITE_HOST: ''
+          HVD_NOINDEX: ''
+          PUBLIC_PREVIEW: ''
+          HVD_ALLOW_PLACEHOLDERS: ''
+        run: npm run build
+
+      - name: Hand the build to the deploy job
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: site/dist
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Upload to the live host
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: production
+      url: https://hvdiscover.com/
+    outputs:
+      uploaded: ${{ steps.upload.outputs.uploaded }}
+      previous: ${{ steps.upload.outputs.previous }}
+      files: ${{ steps.upload.outputs.files }}
+      deleted: ${{ steps.upload.outputs.deleted }}
+    steps:
+      - name: Check out the deploy scripts (this workflow's commit, not the deployed version)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
+      - name: Fetch the build
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      # The steps below get the secrets: make sure the scripts they run are exactly this commit's.
+      - name: The deploy scripts are unchanged
+        run: |
+          if [[ -n "$(git status --porcelain --untracked-files=all -- .github)" ]]; then
+            echo "::error title=Scripts changed::.github/ differs from commit $GITHUB_SHA after the build was fetched; refusing to run with the secrets."
+            exit 1
+          fi
+
+      - name: Refuse anything but a production build
+        run: bash .github/scripts/deploy.sh verify dist
+
+      - name: Is deployment configured?
+        id: cfg
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: bash .github/scripts/deploy.sh check-config
+
+      - name: Install lftp
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends lftp
+          lftp --version | head -n 1
+
+      - name: Upload (a dry run only shows the plan)
+        id: upload
+        if: steps.cfg.outputs.configured == 'true' || inputs.dry_run
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+          DEPLOY_COMMIT: ${{ needs.build.outputs.commit }}
+        run: bash .github/scripts/deploy.sh deploy dist
+
+  smoke:
+    name: Check the live site
+    needs: [build, deploy]
+    if: github.ref == 'refs/heads/main' && needs.deploy.outputs.uploaded == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out the check script (this workflow's commit)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
+      - name: Fetch the build
+        uses: actions/download-artifact@v4
+        with:
+          name: site-dist
+          path: dist
+
+      - name: Check the live site against the build
+        env:
+          DEPLOY_COMMIT: ${{ needs.build.outputs.commit }}
+          PREVIOUS_COMMIT: ${{ needs.deploy.outputs.previous }}
+          UPLOADED_FILES: ${{ needs.deploy.outputs.files }}
+          DELETED_FILES: ${{ needs.deploy.outputs.deleted }}
+        run: bash .github/scripts/smoke.sh dist

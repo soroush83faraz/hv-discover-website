@@ -76,7 +76,8 @@ site/                    the Astro project
 api/                     the PHP form API (quote, contact, token endpoints)
   CLIENT.md              the contract between the site and the API
 docs/screenshots/        the images in this README
-.github/workflows/       builds and publishes the design preview
+.github/workflows/       pages.yml: the design preview; deploy.yml: the production deploy
+.github/scripts/         deploy.sh (FTPS upload and its guards), smoke.sh (live-site checks)
 ```
 
 ## Run it
@@ -93,6 +94,29 @@ npm run build:preview  # the design preview for GitHub Pages in site/dist/
 
 `npm run build:preview` takes the base path from `PREVIEW_BASE` (default `/hv-discover-website`).
 The forms need PHP; `api/CLIENT.md` explains how to run the API locally.
+
+## Deployment
+
+A push to `main` builds the production site and deploys it to the live host
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)). The host is shared Apache
+hosting without SSH, so the upload goes over FTPS (FTP with TLS, certificate checked) from GitHub
+Actions with `lftp`; no third-party action ever sees the credentials.
+
+- **Credentials** live only as secrets of a GitHub Environment (`production`), for an FTP account
+  that can reach nothing but the web root. Nothing secret is in this repository. Only the deploy
+  job can read the secrets, and it runs only this workflow's own scripts, never the code being
+  deployed; there is no pull-request trigger, so forks never reach them.
+- **Safe on a live site.** Changed files are uploaded under hidden temporary names, their sizes
+  are checked on the server, and only then renamed into place: assets first, then the form API,
+  the pages, and `.htaccess` last. Unchanged hashed assets are left alone; the only files ever
+  deleted are stale ones in `_astro/`. A guard refuses any plan that would touch other sites'
+  folders on the same account (`blog/`, `my/`, `staging/`, `.well-known/`, `cgi-bin/` and more).
+- **Checked after every deploy.** The live home page must be byte-identical to the build, with
+  this build's Content-Security-Policy and security headers; redirects, old WordPress URLs and
+  the form API are checked too. The run summary has the results.
+- **Dry run and rollback.** Run the workflow by hand with `dry_run` to see the plan without
+  writing anything. To roll back, run it with `ref` set to an earlier commit of `main`: that
+  version is rebuilt and deployed the same way.
 
 ## Notes
 
