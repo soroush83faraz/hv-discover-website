@@ -2,10 +2,10 @@
 /**
  * /cable-test-van: port of design/mockups/cable-test-van.html.
  * Hero, what's on board (stations with one function tile each: the equipment is named by
- * function, its model is a slot until confirmed), inside the cabin (numbered callouts on
+ * function only, no model is named until the owner confirms it), inside the cabin (numbered callouts on
  * the interior photo, linked to the legend by hover and focus), the rear doors, photos (the
- * product Gallery with all van images), how a call-out works, specifications, FAQ and the
- * contact band.
+ * product Gallery with all van images), how a call-out works, specifications and the contact
+ * band. (The FAQ went with the owner questions it could not answer: docs/04-owner-questions.md H.)
  * The van is a showcase, not quotable (src/data/quotable.ts): its calls to action go to
  * /contact, never to the quote list.
  * Van data (lede, key figures, photos, specs, contact band) comes from
@@ -17,7 +17,6 @@ import KeyFigures from '../components/KeyFigures.astro';
 import SpecTable from '../components/SpecTable.astro';
 import QuoteBand from '../components/QuoteBand.astro';
 import Button from '../components/Button.astro';
-import Slot from '../components/Slot.astro';
 import FamilyDiagram from '../components/FamilyDiagram.astro';
 import Gallery from '../components/Gallery.astro';
 import { WORKFLOW_STEPS } from '../data/families';
@@ -49,13 +48,13 @@ const IN_THE_VAN: Record<number, string> = {
 };
 /**
  * What the photos show for each step, by function. The fitted models are not confirmed, so no
- * product is named or linked here: each model is a slot until the owner confirms it.
+ * product or model is named or linked here (docs/04-owner-questions.md E.6 and H).
  */
-const ON_BOARD: Record<number, { name: string; note?: string; slot: string }> = {
-  1: { name: 'Reflectometer', slot: 'reflectometer model' },
-  2: { name: 'Surge generator', note: 'With the HV connection panel at the rear doors.', slot: 'surge generator model' },
-  3: { name: 'Acoustic receiver', note: 'With headphones.', slot: 'acoustic receiver model' },
-  4: { name: 'Route tracer', note: 'Transmitter and receiver.', slot: 'route tracer model' },
+const ON_BOARD: Record<number, { name: string; note: string }> = {
+  1: { name: 'Reflectometer', note: 'On the bench, in an orange hard case.' },
+  2: { name: 'Surge generator', note: 'With the HV connection panel at the rear doors.' },
+  3: { name: 'Acoustic receiver', note: 'With headphones.' },
+  4: { name: 'Route tracer', note: 'Transmitter and receiver.' },
 };
 const stations = WORKFLOW_STEPS.map((f) => ({ ...f, equipment: ON_BOARD[f.step as number] }));
 
@@ -123,7 +122,7 @@ const jsonLd = [
                   </div>
                   <div>
                     <p class="mini-tile__model">{f.equipment.name}</p>
-                    <p class="mini-tile__name">{f.equipment.note && <>{f.equipment.note}{' '}</>}Model: <Slot text={f.equipment.slot} /></p>
+                    <p class="mini-tile__name">{f.equipment.note}</p>
                   </div>
                 </div>
               </div>
@@ -160,9 +159,9 @@ const jsonLd = [
         </figure>
         <div class="callouts__legend">
           <ol class="legend">
-            <li data-callout="1" tabindex="0"><span class="legend__num" aria-hidden="true">1</span><span><span class="sr-only">1. </span><b>Instrument in an aluminium case</b> <span class="legend__what">HV Discover label, two digital displays and a high-voltage lead. <Slot text="model to confirm" /></span></span></li>
-            <li data-callout="2" tabindex="0"><span class="legend__num" aria-hidden="true">2</span><span><span class="sr-only">2. </span><b>Route-tracing transmitter</b> <span class="legend__what">In an orange hard case. <Slot text="model to confirm" /></span></span></li>
-            <li data-callout="3" tabindex="0"><span class="legend__num" aria-hidden="true">3</span><span><span class="sr-only">3. </span><b>Reflectometer</b> <span class="legend__what">Step 1, in an orange hard case on the bench, ready for the first shot. <Slot text="model to confirm" /></span></span></li>
+            <li data-callout="1" tabindex="0"><span class="legend__num" aria-hidden="true">1</span><span><span class="sr-only">1. </span><b>Instrument in an aluminium case</b> <span class="legend__what">HV Discover label, two digital displays and a high-voltage lead.</span></span></li>
+            <li data-callout="2" tabindex="0"><span class="legend__num" aria-hidden="true">2</span><span><span class="sr-only">2. </span><b>Route-tracing transmitter</b> <span class="legend__what">In an orange hard case.</span></span></li>
+            <li data-callout="3" tabindex="0"><span class="legend__num" aria-hidden="true">3</span><span><span class="sr-only">3. </span><b>Reflectometer</b> <span class="legend__what">Step 1, in an orange hard case on the bench, ready for the first shot.</span></span></li>
             <li data-callout="4" tabindex="0"><span class="legend__num" aria-hidden="true">4</span><span><span class="sr-only">4. </span><b>Control panel</b> <span class="legend__what">Two meters, status lamps for main, standby, surge, ARM, BT and 80 kV, a red push button and selector switches.</span></span></li>
             <li data-callout="5" tabindex="0"><span class="legend__num" aria-hidden="true">5</span><span><span class="sr-only">5. </span><b>UPS</b> <span class="legend__what">Under the control panel.</span></span></li>
             <li data-callout="6" tabindex="0"><span class="legend__num" aria-hidden="true">6</span><span><span class="sr-only">6. </span><b>Pull-out drawer</b> <span class="legend__what">A hand-held receiver and headphones.</span></span></li>
@@ -178,9 +177,9 @@ const jsonLd = [
         </div>
         <div class="inbox">
           <ul class="inbox__list">
-            <li><span>Connection panel with terminals labelled TDR, FLS, BT, <span class="nowrap">H.V 40 kV</span>, <span class="nowrap">H.V 80 kV</span> and Earth. Ratings <Slot /></span></li>
-            <li><span>Output cable reels, red and orange. Lengths <Slot /></span></li>
-            <li><span>A unit inside a mesh guard, wired to the panel. Function <Slot /></span></li>
+            <li><span>Connection panel with terminals labelled TDR, FLS, BT, <span class="nowrap">H.V 40 kV</span>, <span class="nowrap">H.V 80 kV</span> and Earth.</span></li>
+            <li><span>Output cable reels, red and orange.</span></li>
+            <li><span>A unit inside a mesh guard, wired to the panel.</span></li>
             <li><span>Instrument cases and a pull-out tray</span></li>
           </ul>
           <figure>
@@ -268,32 +267,6 @@ const jsonLd = [
       </div>
       <div class="split__body">
         <SpecTable groups={d.specs} />
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--white" aria-labelledby="faq-title">
-    <div class="wrap split">
-      <div class="split__head">
-        <h2 id="faq-title">Questions about the van</h2>
-      </div>
-      <div class="split__body--narrow faq">
-        <details open>
-          <summary>Is operator training available?</summary>
-          <div class="faq__answer"><p>Training on each instrument and on the whole sequence, from the first pulse to the dig spot: <Slot /></p></div>
-        </details>
-        <details>
-          <summary>Can you fit the equipment to our own vehicle?</summary>
-          <div class="faq__answer"><p><Slot /></p></div>
-        </details>
-        <details>
-          <summary>How long does delivery take?</summary>
-          <div class="faq__answer"><p>Delivery time: <Slot /></p></div>
-        </details>
-        <details>
-          <summary>Can the instruments be used outside the van?</summary>
-          <div class="faq__answer"><p>The acoustic receiver and the route-tracing receiver are hand-held and go out with the crew. Removing the bench instruments for use elsewhere: <Slot /></p></div>
-        </details>
       </div>
     </div>
   </section>

@@ -92,7 +92,7 @@ const label = photos.length > 1 ? `${d.model} photos` : first ? `${d.model} phot
           decoding={eager ? undefined : 'async'}
         />
       ) : (
-        d.drawing && <PlaceholderDrawing type={d.drawing} label={d.drawingAlt} caption="Line drawing. Photo coming soon." />
+        d.drawing && <PlaceholderDrawing type={d.drawing} label={d.drawingAlt} caption="Line drawing" />
       )
     }
   </div>
@@ -127,7 +127,7 @@ const label = photos.length > 1 ? `${d.model} photos` : first ? `${d.model} phot
     )
   }
   <p class="gallery__caption" aria-live={photos.length > 1 ? 'polite' : undefined}>
-    {first ? (first.caption ?? '') : 'The drawing stands in until the product is photographed.'}
+    {first ? (first.caption ?? '') : 'Illustration only, not a photograph of the product.'}
   </p>
 </section>
 

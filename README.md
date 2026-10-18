@@ -2,24 +2,29 @@
 
 A product catalogue and request-a-quote website for HV Discover, a London supplier of underground
 cable fault-location equipment: time domain reflectometers, surge generators, an arc reflection
-filter, an acoustic pinpointer, a cable route tracer and a cable test van. It replaces a
-WordPress site built with Woodmart and Elementor with a static site that is faster, accessible and
-easier to keep correct.
+filter, an acoustic pinpointer, a cable route tracer and a cable test van. The Home page opens on
+what is supplied, shown with real equipment photography, then walks through the four jobs of fault
+location and an instrument for each. It replaces a WordPress site built with Woodmart and Elementor
+with a static site that is faster, accessible and easier to keep correct.
 
 Live preview: https://soroush83faraz.github.io/hv-discover-website/
 
-![Home page: the hero instrument with its hover card](docs/screenshots/home-hero-1440.jpg)
+![Home page, first screen: the headline, what is supplied and three equipment photos with captions](docs/screenshots/home-first-screen-1440.jpg)
 
 ## Highlights
 
 - **Design system.** Colour, type, spacing and layout come from one set of CSS tokens. The
   palette is taken from a medium-voltage cable cross-section, and the whole site uses one
   variable font (Archivo), with its width axis carrying the hierarchy instead of extra families.
-- **Interactive hero.** The Home page opens on a TDR instrument that synthesises ten different
-  traces (open circuit, short circuit, high-resistance fault, arc reflection, wet section and
-  more). Pointing at the trace, or tapping it on a phone, reads out the distance and opens a
-  card that explains what the event on the trace means. `?trace=1` to `?trace=10` opens a
-  scenario directly.
+- **A first screen that says what is supplied.** The Home page opens on the job ("Find the fault
+  in an underground cable."), one sentence on what the company supplies, three real figures taken
+  from the product files and a composition of three product photos (AP-01, TDR-901, PG-32) with
+  leader-line captions that link to their pages.
+- **Interactive TDR instrument.** A "how fault location works" band on the Home page holds a TDR
+  instrument that synthesises ten different traces (open circuit, short circuit, high-resistance
+  fault, arc reflection, wet section and more). Pointing at the trace, or tapping it on a phone,
+  reads out the distance and opens a card that explains what the event on the trace means.
+  `?trace=1` to `?trace=10` opens a scenario directly.
 - **Request-a-quote list.** Any instrument can be added to a quote list from its tile or page;
   the list, with quantities, goes out with the quote form. The PHP form API behind it was
   security reviewed: signed single-use tokens, rate limits per client and overall, a honeypot,
@@ -36,12 +41,14 @@ Live preview: https://soroush83faraz.github.io/hv-discover-website/
 
 | | |
 |---|---|
-| ![The hero at phone width](docs/screenshots/home-hero-390.jpg) | ![The arc reflection scenario with its card](docs/screenshots/arc-reflection-1440.jpg) |
-| Home hero at 390 px | Arc reflection scenario (`?trace=4`) |
-| ![PG-32 product page with its photo gallery](docs/screenshots/product-pg-32.jpg) | ![The cable test van page](docs/screenshots/cable-test-van.jpg) |
-| Product page with gallery (PG-32) | Cable test van |
+| ![The four jobs: photo cards hung from a four-node cable line](docs/screenshots/home-jobs-1440.jpg) | ![The dark how-it-works band with the TDR instrument and its hover card on an arc reflection](docs/screenshots/process-band-1440.jpg) |
+| Four jobs, and an instrument for each | The TDR instrument band (`?trace=4`, arc reflection) |
+| ![Home first screen at phone width](docs/screenshots/home-first-screen-390.jpg) | ![PG-32 product page with its photo gallery](docs/screenshots/product-pg-32.jpg) |
+| Home first screen at 390 px | Product page with gallery (PG-32) |
 
-![The fault-location page with the interactive TDR lab](docs/screenshots/fault-location-lab.jpg)
+![The cable test van page](docs/screenshots/cable-test-van.jpg)
+
+*Cable test van page.*
 
 ## Stack
 
@@ -61,7 +68,7 @@ site/                    the Astro project
   src/content/products/  one Markdown file per product: the single source of truth
   src/components/        one component per design-system part
   src/pages/             the routes (Home, catalogue, product pages, van, quote, support ...)
-  src/scripts/           client TypeScript (hero, gallery, quote list, forms)
+  src/scripts/           client TypeScript (TDR instrument, gallery, quote list, forms)
   src/styles/            tokens, base and component CSS
   public/                .htaccess template, robots.txt, datasheet PDFs
   scripts/               sync-api.mjs, csp-hashes.mjs, build-preview.mjs

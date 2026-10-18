@@ -14,14 +14,14 @@ description: Reflectometer, surge generator, acoustic receiver and route tracer 
 keyFiguresLayout: text
 keyFigures:
   - { label: Steps covered, value: 1 to 4 }
-  - { label: Instrument models, slot: to confirm }
-  - { label: Base vehicle, slot: to confirm }
-  - { label: HV output, slot: to confirm }
+  - { label: On board, value: "Reflectometer, surge generator, acoustic receiver, route tracer" }
+  - { label: Body, value: High-roof panel van }
+  - { label: At the rear, value: "HV connection panel, four cable reels" }
 tileFiguresLayout: rows
 tileFigures:
   - { label: Steps covered, value: 1 to 4 }
   - { label: On board, value: "Reflectometer, surge generator, acoustic receiver, route tracer" }
-  - { label: Base vehicle, slot: to confirm }
+  - { label: Body, value: High-roof panel van }
 
 # Gallery order (the "Photos" section). The page also picks three of them by file name for its
 # own sections: van-exterior (hero, OG image), van-interior (cabin callouts), van-rear (rear doors).
@@ -58,32 +58,26 @@ tileAlt: "The cable test van from the front left: white high-roof van with the H
 
 datasheet: null
 
-specsSource: Equipment as photographed. Models, ratings and most vehicle details are still to confirm.
+# Only what the photos show, by function: instrument models, base vehicle, crew seats, power
+# supply, UPS rating, HV output and reel lengths are left out until confirmed
+# (docs/04-owner-questions.md H).
+specsSource: Equipment as photographed.
 specs:
-  - group: Vehicle
-    rows:
-      - { label: Base vehicle, slot: to confirm }
-      - { label: Body, value: "High-roof panel van, side windows, sliding side door, twin rear doors" }
-      - { label: Crew seats, slot: to confirm }
   - group: Instruments
     rows:
-      - { label: Reflectometer, slot: reflectometer model }
-      - { label: Surge generator, value: With the HV connection panel at the rear doors, slot: surge generator model }
-      - { label: Acoustic receiver, slot: acoustic receiver model }
-      - { label: Route tracer, value: Transmitter and receiver, slot: route tracer model }
+      - { label: Reflectometer, value: "On the bench, in an orange hard case" }
+      - { label: Surge generator, value: With the HV connection panel at the rear doors }
+      - { label: Acoustic receiver, value: With headphones }
+      - { label: Route tracer, value: Transmitter and receiver }
       - { label: Control panel, value: "Two meters; lamps for main, standby, surge, ARM, BT and 80 kV, as labelled" }
-  - group: Power
-    rows:
-      - { label: Supply on board, slot: to confirm }
-      - { label: UPS, value: "Rack-mounted under the control panel, rating", slot: to confirm }
-      - { label: External mains connection, slot: to confirm }
+      - { label: UPS, value: Rack-mounted under the control panel }
   - group: High voltage
     rows:
-      - { label: HV output, slot: to confirm }
       - { label: Rear panel terminals, value: "TDR, FLS, BT, ~H.V 40 kV~, ~H.V 80 kV~, Earth, as labelled" }
-      - { label: Cable reels, value: "Four, at the rear doors. Lengths", slot: to confirm }
-  - group: Cabin
+      - { label: Cable reels, value: "Four, at the rear doors" }
+  - group: Vehicle and cabin
     rows:
+      - { label: Body, value: "High-roof panel van, side windows, sliding side door, twin rear doors" }
       - { label: Instrument bench, value: "Cooling fans in the front, pull-out drawer for the hand-held instruments" }
       - { label: Lighting, value: LED roof light }
       - { label: Safety, value: "Fire extinguisher bracket, electric shock warning sign" }

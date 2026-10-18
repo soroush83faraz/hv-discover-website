@@ -2,11 +2,12 @@
 /**
  * Privacy notice: port of design/mockups/privacy.html (pages-b.css).
  * A short document with a sticky table of contents, written for UK law (UK GDPR and the
- * Data Protection Act 2018). Still a draft for legal review: the status note and the slots
- * stay until the text is approved.
+ * Data Protection Act 2018). Still a draft for legal review: the status note stays until the
+ * text is approved. Retention periods and the storage list are conservative defaults chosen
+ * without the owner's input (docs/04-owner-questions.md H); the storage list matches the
+ * scripts (src/scripts: quote-store, quote, quote-starter, tdr).
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Slot from '../components/Slot.astro';
 import { SITE } from '../data/site';
 import { breadcrumbs } from '../lib/structured-data';
 import '../styles/pages-b.css';
@@ -21,9 +22,9 @@ import '../styles/pages-b.css';
     <p class="page-head__sub">What we collect when you ask for a quote or send a message, why, and for how long.</p>
     <div class="form-status doc-status" role="note">
       <b>Draft for legal review.</b>
-      <span>Not yet approved. Values marked with a dashed line are decisions still to make.</span>
+      <span>This notice has not yet been approved.</span>
     </div>
-    <p class="doc-meta">Last updated: <Slot text="date of approval" /></p>
+    <p class="doc-meta">Last updated: October 2026</p>
   </div>
 
   <div class="wrap doc doc--page">
@@ -44,8 +45,8 @@ import '../styles/pages-b.css';
     <div class="doc__body measure">
       <section id="who" aria-labelledby="who-title">
         <h2 id="who-title">Who we are</h2>
-        <p>This website is run by HV Discover, <Slot text="registered company name" />, based in {SITE.city}, {SITE.country}. Registered office: {SITE.address.join(', ')}.</p>
-        <p>We are the controller of the personal data described in this notice, under the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018. Information Commissioner&rsquo;s Office registration number: <Slot text="ICO registration number" />.</p>
+        <p>This website is run by HV Discover, {SITE.city}, {SITE.country}. Office address: {SITE.address.join(', ')}.</p>
+        <p>We are the controller of the personal data described in this notice, under the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.</p>
         <p>Write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a> about anything in this notice.</p>
       </section>
 
@@ -74,19 +75,22 @@ import '../styles/pages-b.css';
 
       <section id="keep" aria-labelledby="keep-title">
         <h2 id="keep-title">How long we keep it</h2>
-        <p>Requests that do not lead to an order are deleted after <Slot text="retention period" />. For customers, records are kept as long as the support period and the law require: <Slot text="customer retention period" />. Security log entries are deleted after 180 days.</p>
+        <p>Enquiries and quote requests that do not lead to an order are kept for up to 24 months after our last contact with you, then deleted.</p>
+        <p>If you become a customer, we keep your order and customer records for 6 years, as UK tax and accounting rules require.</p>
+        <p>Security log entries are deleted after 180 days.</p>
       </section>
 
       <section id="share" aria-labelledby="share-title">
         <h2 id="share-title">Who sees it</h2>
-        <p>HV Discover staff who handle quotes and support. Our email and hosting providers process the messages on our behalf, under contract and only on our instructions: <Slot text="email and hosting providers" />.</p>
-        <p>Where those providers store the data, and the safeguard used if any of it is held outside the United Kingdom: <Slot text="data location and transfer safeguards" />.</p>
+        <p>HV Discover staff who handle quotes and support.</p>
+        <p>We use email and web hosting providers to run this site and send our replies.</p>
       </section>
 
       <section id="browser" aria-labelledby="browser-title">
         <h2 id="browser-title">Your browser</h2>
         <p>Your quote list is kept in your own browser&rsquo;s storage until you send it. It is not sent to us before you submit the form, and you can clear it by removing the products or clearing your browser data.</p>
-        <p>Analytics and cookies: <Slot text="none, or name the tool and what it records" />.</p>
+        <p>This site sets no cookies and uses no analytics or advertising tools.</p>
+        <p>Besides the quote list and the quantities you enter, it keeps only two short-lived notes in your browser, for the current session: the answers from the short form on the home page, carried to the quote page, and a summary of a request you have just sent, shown on the confirmation page. It also remembers which sample trace the home page showed last, so that the next visit shows another one. None of this is sent to us unless you submit a form.</p>
       </section>
 
       <section id="rights" aria-labelledby="rights-title">

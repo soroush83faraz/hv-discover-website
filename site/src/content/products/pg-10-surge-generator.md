@@ -19,39 +19,26 @@ tileFigures:
 
 images: []
 drawing: pg-10
-drawingAlt: "Line drawing of the PG-10: a rugged steel case with two top handles, a front nameplate, a voltage meter, earth terminals and a control dial. Photo coming soon."
+drawingAlt: "Line drawing of a surge generator case, for illustration only: not a picture of the PG-10."
 
 datasheet: null
 
 fitLead: The PG-10 is step 2. It prepares the fault for the reflectometer before it and the pinpointer after it.
 
-specsSource: Values from the product text on the previous website. No datasheet yet.
+specsSource: Values from the product text on the previous website.
 specs:
   - group: Output and methods
     rows:
-      - { label: Surge voltage, value: "5 and 10 {kV} ranges, continuously variable", slot: third range to confirm }
+      - { label: Surge voltage, value: "5 and 10 {kV} ranges, continuously variable" }
       - { label: Surge energy, value: "1000 {J}, full energy in each range" }
       - { label: DC test voltage, value: Up to 10, unit: kV }
       - { label: "Test current, DC", value: 10 / 20, unit: mA }
-      - { label: Operating modes, value: "Surge, arc reflection (ARM), impulse current (ICM), DC test", slot: mode names to confirm }
       - { label: Shots, value: "Single or repeated; a set sequence on request" }
   - group: Indication
     rows:
       - { label: Display, value: Colour touch screen }
-  - group: Power and environment
-    rows:
-      - { label: AC supply, slot: to confirm }
-      - { label: Operating temperature, slot: to confirm }
-      - { label: Protection class, slot: to confirm }
-  - group: Mechanical
-    rows:
-      - { label: Dimensions, slot: to confirm }
-      - { label: Weight, slot: to confirm }
-      - { label: Case, slot: to confirm }
-  - group: Service
-    rows:
-      - { label: Calibration, slot: to confirm }
-      - { label: Scope of supply, slot: to confirm }
+  # Supply, environment, size, weight, case and service rows are left out until confirmed
+  # (docs/04-owner-questions.md H).
 
 worksWith: [tdr-901-time-domain-reflectometer, arm-filter, ap-01-acoustic-pinpointer]
 worksWithLead: Through the ARM Filter the PG-10 feeds the TDR-901 for arc reflection, and its discharges are what the AP-01 listens for.
@@ -70,4 +57,4 @@ The PG-10 is the smaller of the two surge generators, rated up to 10 kV and 1,00
 
 The surge voltage is adjusted without steps inside a 5 kV and a 10 kV range, and the full 1,000 J is available in both. The set fires one shot at a time or repeats them, and it also runs DC tests up to 10 kV at 10 or 20 mA.
 
-Modes and settings are chosen on a colour touch screen. Dimensions, weight and supply follow with the datasheet.
+Modes and settings are chosen on a colour touch screen.

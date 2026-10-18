@@ -15,6 +15,7 @@ npm run dev       # http://localhost:4321 (only one dev server at a time: the ma
 npm run build     # static site in dist/ (runs sync-api first, see "Form API" below)
 npm run preview   # serves dist/ on http://localhost:4330
 npm run check     # astro check (types in .astro and .ts)
+npm run check:placeholders   # the placeholder check alone, on an existing dist/ (see "No placeholders")
 npm run sync-api  # copy ../api into public/api/ without building
 npm run build:preview   # design preview for GitHub Pages in dist/ (see "Design preview")
 ```
@@ -192,14 +193,16 @@ src/
   lib/inline.ts         inline syntax for data strings ({unit}, ~nowrap~, [link](/url))
   pages/                routes
   scripts/              client TypeScript, loaded by the components that need it
-  styles/               tokens.css, base.css, components.css (global); pages-a.css, pages-b.css (per page);
-                        preview.css (design preview build only)
+  styles/               tokens.css, base.css, components.css (global); pages-a.css, pages-b.css, home.css
+                        (per page); preview.css (design preview build only)
 ```
 
 ## CSS
 
 - `tokens.css`, `base.css`, `components.css` are imported once by `BaseLayout.astro` and apply everywhere.
   They are the mockups' `styles.css`, split, with the styleguide-only rules dropped.
+- `home.css` (Home only: the hero with the equipment group, the four jobs, the band around the TDR
+  instrument; the instrument panel itself is in `components.css`).
 - `pages-a.css` (products, product pages, cable test van) and `pages-b.css` (fault location, quote,
   quote sent, about, support, contact, privacy, 404) are the mockups' page CSS, unchanged. **Import the
   right one in the page** (`import '../styles/pages-a.css';`). Never import both on one page: they style
@@ -225,7 +228,7 @@ event handlers or `style` attributes: the build fails on them.
 | `menu.ts` | Header | mobile menu sheet |
 | `quote-list.ts` | Header (every page) | header count + pulse ring, every `[data-add-quote]` button, `#quote-status` |
 | `lib/quote-store.ts` | the scripts below | the quote list in localStorage `hvd-quote-list`; keeps only the six quotable models (`data/quotable.ts`) and drops any other id, e.g. a `Cable test van` saved by an older version, when it reads the list |
-| `tdr.ts` | TdrInstrument | hero trace: load sequence, cursor, keyboard, reduced motion |
+| `tdr.ts` | TdrInstrument | Home TDR trace: built when the panel nears the viewport (or on focus/pointer), load sequence when it scrolls into view, cursor, keyboard, reduced motion |
 | `gallery.ts` | Gallery | product gallery crossfade and thumbnails; creates the second stage layer on first use (see "Images") |
 | `quote-starter.ts` | QuoteStarter | Home form: validation, carries answers to `/request-a-quote?voltage=&length=&fault=` and sessionStorage `hvd-quote-starter` |
 | `catalog.ts` | /products, /cable-test-van | family filter, van callouts |
@@ -248,14 +251,16 @@ To wire one: `<script>import '../scripts/catalog';</script>` at the end of the p
 | `AddToQuote.astro` | the Add to quote toggle for one product model (behaviour from quote-list.ts) |
 | `NameplateTile.astro` | product tile: 4:3 photo or drawing, step, nameplate model, figures, Add to quote (the van: a plain link to its page instead); `wide`, `row` |
 | `WorkflowLine.astro` | the 1–4 cable line; `variant="compact" current={slug}` for "Where it fits" |
+| `SolutionCards.astro` | Home "Four jobs, and an instrument for each": four plates on one cable line (photo, job, one sentence from `families.ts` `job`, family diagram, instrument links) |
+| `EquipmentGroup.astro` | Home hero: TDR-901, PG-32 and AP-01 multiplied onto a white stage, with leader-line captions (two photos and a caption list on phones); the TDR-901 photo is the LCP image |
 | `FamilyDiagram.astro` | the small physics line diagram per family (1–4, `system`) |
 | `KeyFigures.astro` | the four key figures beside the product nameplate (numeric or text) |
 | `SpecTable.astro` | grouped spec tables from `product.data.specs` |
 | `Gallery.astro` | product page gallery (stage, thumbnails, caption) or the drawing when there is no photo; also the van page "Photos" section (`eager={false}`, own `sizes`) |
 | `QuoteBand.astro` | closing quote band; default actions with `model`, or custom ones via `slot="actions"` |
-| `Slot.astro` | dashed "[to confirm]" placeholder for an unconfirmed fact |
-| `PlaceholderDrawing.astro` | PG-10 technical drawing with "Photo coming soon" (CRT-015's drawing is the fallback for its photo) |
-| `TdrInstrument.astro` | the hero TDR instrument (Home) |
+| `Slot.astro` | dashed "[to confirm]" placeholder, for drafts only: the build fails on it (see "No placeholders") |
+| `PlaceholderDrawing.astro` | PG-10 line drawing, captioned "Line drawing" and "Illustration only" (CRT-015's drawing is the fallback for its photo) |
+| `TdrInstrument.astro` | the TDR instrument as a white panel in the Home band (readout in its header; the page renders the usage hint `#tdr-hint`) |
 | `QuoteStarter.astro` | the Home "Tell us about the cable" form |
 | `QuoteCatalog.astro` | `#quote-catalog` JSON for quote.ts (/request-a-quote, /quote-sent) |
 
@@ -279,7 +284,10 @@ instruments and `contactBand` for the van.
 - The Markdown body is the "Overview" section (empty for the ARM Filter and the van).
 - Short text fields render through `lib/inline.ts`: `{kV}` → unit span, `~PG-32~` → no line break,
   `[TDR-901](/products/tdr-901-time-domain-reflectometer)` → link. Everything else is escaped.
-- **Unconfirmed facts go in a `slot` field** (`slot: to confirm`), never into `value`. Slot.astro renders them.
+- **Publish only confirmed facts.** A value nothing proves (datasheet, a plate or label in our own photos) is
+  left out: delete the row, figure or sentence, never guess it and never show a placeholder. The questions
+  for what was left out are in `../docs/04-owner-questions.md` (section H). A `slot` field still exists for
+  drafting, but the build fails on it (see "No placeholders").
 - Get products through `src/lib/products.ts` (`getProducts`, `getInstruments`, `getProduct(slug)`,
   `getProductsBySlugs(worksWith)`), and link with `productHref(product)`.
 
@@ -293,7 +301,7 @@ A product page reads, in this order: `images`/`drawing` → Gallery, `family` �
 
 1. Put a 1600 px JPG on white in `src/assets/img/` (or set `drawing` while there is no photo).
 2. Copy an existing file in `src/content/products/` to `<slug>.md`; set `slug`, `family`, `order`.
-3. Fill the fields; use `slot` for anything not confirmed. `npm run check` validates the schema
+3. Fill the fields; leave out anything not confirmed. `npm run check` validates the schema
    (unknown keys in figures and spec rows are errors, so typos fail loudly).
 4. It appears in the tiles, the workflow line, the footer and the quote catalog automatically; the
    product page route builds it from the slug. Add a redirect in `.htaccess` if it replaces an old URL.
@@ -318,8 +326,18 @@ python -P -E ../tools/make_datasheets.py --site .         # writes public/datash
 - After any change to those three product files, rerun the script and commit the PDFs with it.
 - The script checks each PDF (two pages at most, nothing overflowing, fonts embedded, no
   non-Latin text or forbidden words, under 600 KB) and fails otherwise. Products without a
-  `datasheet` show "Datasheet in preparation." on their page.
+  `datasheet` show no datasheet line on their page (no "in preparation" promise).
 - Run it with `python -P -E`, not `-I`: Playwright lives in the user site-packages on this machine.
+
+## No placeholders
+
+The published site shows no placeholder: no "[to confirm]", no "coming soon", no reply-time or
+delivery promise that needs a fact we do not have. `scripts/no-placeholders.mjs` runs after every
+build (an integration in `astro.config.mjs`, next to `csp-hashes.mjs`) and **fails the build** when a
+page in `dist/` holds a Slot element (`class="slot"`) or a bracketed "[… to confirm]" / "[… to follow]".
+Strict by default; for a draft build, list the pages allowed to keep placeholders in
+`HVD_ALLOW_PLACEHOLDERS` (comma-separated paths relative to `dist/`, e.g. `privacy.html`, or `*`); they
+are still listed in the log. `npm run check:placeholders` runs the check alone on an existing `dist/`.
 
 ## Images
 

@@ -8,9 +8,10 @@ export const SITE = {
   url: 'https://hvdiscover.com',
   email: 'info@hvdiscover.com',
   /**
-   * Only London, United Kingdom is confirmed. The company name and a UK phone number are still
-   * to confirm: pages show them as Slot placeholders. Structured data and meta tags carry
-   * city and country only (never the street below).
+   * Only London, United Kingdom is confirmed. The registered company name and a UK phone number
+   * are not: no page shows them, and contact is by email only (docs/04-owner-questions.md H).
+   * Structured data and meta tags carry city and country only (never the street below), and
+   * no telephone.
    */
   city: 'London',
   country: 'United Kingdom',

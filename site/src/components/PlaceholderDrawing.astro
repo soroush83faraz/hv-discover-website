@@ -12,11 +12,10 @@ interface Props {
   caption?: string;
 }
 const DEFAULT_LABELS = {
-  'pg-10': 'Placeholder line drawing of a surge generator case. The PG-10 photo is coming soon.',
-  'crt-015':
-    'Placeholder line drawing of a route tracer set: a long hand-held receiver and a portable transmitter. The CRT-015 photo is coming soon.',
+  'pg-10': 'Line drawing of a surge generator case, for illustration only.',
+  'crt-015': 'Line drawing of a route tracer set: a long hand-held receiver and a portable transmitter, for illustration only.',
 };
-const { type, label, caption = 'Photo coming soon' } = Astro.props;
+const { type, label, caption = 'Line drawing' } = Astro.props;
 ---
 <div class="drawing" role="img" aria-label={label ?? DEFAULT_LABELS[type]}>
   {

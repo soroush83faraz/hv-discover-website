@@ -1,0 +1,69 @@
+---
+/**
+ * Home "Four jobs" (replaces the full workflow line and the tile grid on Home): the four
+ * fault-location steps as white plates hung from one cable line with four nodes (the
+ * workflow line idea, design spec 5). Each card: a product photo, the job as a plain verb
+ * phrase, one sentence (src/data/families.ts `job`), the family line diagram and the
+ * instruments of that step as nameplate links. Hover or focus lights the card's segment.
+ * Add to quote stays on the product pages and the catalogue.
+ *   <SolutionCards />
+ */
+import { Picture } from 'astro:assets';
+import { WORKFLOW_STEPS } from '../data/families';
+import { getInstruments, productHref } from '../lib/products';
+import FamilyDiagram from './FamilyDiagram.astro';
+
+/** The photo for each step: a product slug and an index into its `images` (not the Home hero photos). */
+const PHOTO: Record<number, [string, number]> = {
+  1: ['tdr-901-time-domain-reflectometer', 1],
+  2: ['pg-32-surge-generator', 3],
+  3: ['ap-01-acoustic-pinpointer', 1],
+  4: ['crt-015-cable-route-tracer', 0],
+};
+
+const instruments = await getInstruments();
+const cards = WORKFLOW_STEPS.map((f) => {
+  const [slug, i] = PHOTO[f.step as number]!;
+  const photo = instruments.find((p) => p.data.slug === slug)?.data.images[i];
+  if (!photo || !f.job) throw new Error(`SolutionCards: no photo or job text for step ${String(f.step)}`);
+  return { f, job: f.job, photo, products: instruments.filter((p) => p.data.family === f.step) };
+});
+---
+<ol class="jobs">
+  {
+    cards.map(({ f, job, photo, products }) => (
+      <li class="job">
+        <span class="job__node" aria-hidden="true" />
+        <span class="job__num" aria-hidden="true">{f.step}</span>
+        <div class="job__plate">
+          <div class="job__media">
+            <Picture
+              src={photo.src}
+              formats={['avif', 'webp']}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 1400px) 312px, (min-width: 900px) 22vw, (min-width: 600px) 60vw, calc(100vw - 76px)"
+              alt={photo.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <h3 class="job__title">
+            <span class="sr-only">{`Step ${f.step}: `}</span>
+            {job.title}
+          </h3>
+          <p class="job__text">{job.text}</p>
+          <FamilyDiagram step={f.step} class="job__diagram" />
+          <ul class="job__models">
+            {products.map((p) => (
+              <li>
+                <a href={productHref(p)}>
+                  <span class="job__model">{p.data.model}</span> <span class="job__pname">{p.data.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    ))
+  }
+</ol>

@@ -1,0 +1,86 @@
+---
+/**
+ * Home hero: the three core instruments as one group on white, with a leader line and a short
+ * caption for each (what the instrument does). The photos are the white-seamless product shots,
+ * not cut-outs: each sits in its own box and multiplies onto the white stage (mix-blend-mode),
+ * so the white ground vanishes and the soft contact shadows stay. The boxes overlap, the
+ * instruments themselves do not (multiply cannot hide one object behind another), so keep a
+ * gap between them when moving a box. Positions live in home.css (stage units 760 x 540;
+ * the leader lines below use the same units). Phones show two photos (TDR-901 and PG-32) and
+ * the captions as a plain list.
+ *
+ * The TDR-901 photo is the Home LCP element: eager, fetchpriority high.
+ */
+import { Picture } from 'astro:assets';
+import { getProduct, productHref } from '../lib/products';
+
+const [tdr, pg, ap] = await Promise.all([
+  getProduct('tdr-901-time-domain-reflectometer'),
+  getProduct('pg-32-surge-generator'),
+  getProduct('ap-01-acoustic-pinpointer'),
+]);
+const lead = (p: typeof tdr) => {
+  const img = p.data.images[0];
+  if (!img) throw new Error(`EquipmentGroup: ${p.data.model} has no photo`);
+  return img;
+};
+const formats: ('avif' | 'webp')[] = ['avif', 'webp'];
+const widths = [480, 800, 1200, 1600];
+---
+<figure class="kit">
+  <div class="kit__stage">
+    <Picture
+      src={lead(tdr).src}
+      formats={formats}
+      widths={widths}
+      sizes="(min-width: 1400px) 600px, (min-width: 1024px) 42vw, (min-width: 600px) 76vw, 90vw"
+      alt={lead(tdr).alt}
+      loading="eager"
+      fetchpriority="high"
+      decoding="async"
+      pictureAttributes={{ class: 'kit__item kit__item--tdr' }}
+    />
+    <Picture
+      src={lead(pg).src}
+      formats={formats}
+      widths={widths}
+      sizes="(min-width: 1400px) 456px, (min-width: 1024px) 32vw, (min-width: 600px) 58vw, 65vw"
+      alt={lead(pg).alt}
+      loading="eager"
+      decoding="async"
+      pictureAttributes={{ class: 'kit__item kit__item--pg' }}
+    />
+    <Picture
+      src={lead(ap).src}
+      formats={formats}
+      widths={widths}
+      sizes="(min-width: 1400px) 418px, (min-width: 1024px) 30vw, 53vw"
+      alt={lead(ap).alt}
+      loading="lazy"
+      decoding="async"
+      pictureAttributes={{ class: 'kit__item kit__item--ap' }}
+    />
+    <svg class="kit__leaders" viewBox="0 0 760 540" aria-hidden="true" focusable="false">
+      <path d="M420 492V540M600 270V540M150 378V540" />
+      <circle cx="420" cy="492" r="3.5" />
+      <circle cx="600" cy="270" r="3.5" />
+      <circle cx="150" cy="378" r="3.5" />
+    </svg>
+  </div>
+  <figcaption class="kit__notes">
+    <ul class="kit__list">
+      <li class="kit__note kit__note--tdr">
+        <a href={productHref(tdr)} class="kit__model">{tdr.data.model}</a>
+        <span class="kit__does">measures the distance</span>
+      </li>
+      <li class="kit__note kit__note--pg">
+        <a href={productHref(pg)} class="kit__model">{pg.data.model}</a>
+        <span class="kit__does">makes the fault show</span>
+      </li>
+      <li class="kit__note kit__note--ap">
+        <a href={productHref(ap)} class="kit__model">{ap.data.model}</a>
+        <span class="kit__does">pinpoints the spot</span>
+      </li>
+    </ul>
+  </figcaption>
+</figure>

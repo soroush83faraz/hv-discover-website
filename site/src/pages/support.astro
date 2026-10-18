@@ -2,13 +2,13 @@
 /**
  * Support: port of design/mockups/support.html (pages-b.css).
  * What support covers, how to request service, the FAQ and the closing band.
- * FAQPage JSON-LD lists only the questions whose answers are confirmed; questions answered
- * with a slot stay on the page but out of the structured data until they are filled.
+ * The FAQPage JSON-LD lists exactly the questions on the page. Questions with no confirmed
+ * answer (recalibration interval, English manuals, on-site training) are not on the page at all:
+ * see docs/04-owner-questions.md H.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import QuoteBand from '../components/QuoteBand.astro';
-import Slot from '../components/Slot.astro';
 import { SITE } from '../data/site';
 import { breadcrumbs, faqPage } from '../lib/structured-data';
 import '../styles/pages-b.css';
@@ -53,12 +53,10 @@ const faq = faqPage([
         <div class="support-col">
           <h3>Training</h3>
           <p>Operator training on each instrument and on the whole sequence, from the first pulse to the dig spot. Ask for it with your quote.</p>
-          <p class="small">Format and location: <Slot text="training format" /></p>
         </div>
         <div class="support-col">
           <h3>Calibration</h3>
           <p>Instruments ship with a calibration certificate. Recalibration and checks are arranged through support.</p>
-          <p class="small">Interval: <Slot text="recalibration interval" /></p>
         </div>
         <div class="support-col">
           <h3>Spare parts</h3>
@@ -88,12 +86,12 @@ const faq = faqPage([
         <li class="station">
           <span class="station__node" aria-hidden="true"></span>
           <h3>We reply</h3>
-          <p class="station__text">Within <Slot text="reply time" />, with a fix to try, a remote session, or the next step.</p>
+          <p class="station__text">By email, with a fix to try, a remote session, or the next step.</p>
         </li>
         <li class="station">
           <span class="station__node" aria-hidden="true"></span>
           <h3>Repair or return</h3>
-          <p class="station__text">If the instrument has to come in, we agree the return or a site visit with you. <Slot text="return logistics" /></p>
+          <p class="station__text">If the instrument has to come in, we agree the return or a site visit with you.</p>
         </li>
       </ol>
       <div class="btn-row band-cta">
@@ -116,24 +114,12 @@ const faq = faqPage([
           <div class="faq__a"><p>Yes. The TDR-901, PG-32 and AP-01 datasheets list a calibration approval and certificate with each instrument.</p></div>
         </details>
         <details>
-          <summary>How often should an instrument be recalibrated?</summary>
-          <div class="faq__a"><p><Slot text="recalibration interval" />. Ask support when your certificate is due and we arrange the check.</p></div>
-        </details>
-        <details>
           <summary>Can you help me read a trace?</summary>
           <div class="faq__a"><p>Yes. Send a screenshot of the trace with the cable type, its length and the v/2 setting you used. We reply by email.</p><p>For how a trace is read, see <a href="/fault-location#step-1">pre-location on the fault location page</a>.</p></div>
         </details>
         <details>
           <summary>Which spare parts can I order?</summary>
           <div class="faq__a"><p>Test leads, clamps, earth rods, filters and carrying cases. Order by model number, and give the serial number from the rating plate.</p></div>
-        </details>
-        <details>
-          <summary>Are the manuals available in English?</summary>
-          <div class="faq__a"><p>The manuals are written in English. Availability for each instrument: <Slot text="English manual availability" />. Ask for the manual you need by model number.</p></div>
-        </details>
-        <details>
-          <summary>Do you train crews on site?</summary>
-          <div class="faq__a"><p><Slot text="on-site training availability" />. Ask for training with your quote and say how many operators need it.</p></div>
         </details>
       </div>
     </div>

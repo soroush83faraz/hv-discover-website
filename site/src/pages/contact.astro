@@ -8,7 +8,6 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
-import Slot from '../components/Slot.astro';
 import { SITE } from '../data/site';
 import { breadcrumbs } from '../lib/structured-data';
 import '../styles/pages-b.css';
@@ -29,11 +28,9 @@ import '../styles/pages-b.css';
       <dl class="contact-list">
         <div><dt>Email</dt><dd><a class="big" href={`mailto:${SITE.email}`}>{SITE.email}</a></dd></div>
         <div><dt>Office</dt><dd><address>{SITE.address.map((line, i) => (i < SITE.address.length - 1 ? <>{line}<br /></> : line))}</address></dd></div>
-        <div><dt>Phone</dt><dd><Slot text="UK phone number" /></dd></div>
         <div><dt>Office hours</dt><dd>{SITE.hours}</dd></div>
         <div><dt>Prices</dt><dd>Use the <a href="/request-a-quote">quote list</a>: one request for every instrument you need.</dd></div>
         <div><dt>Service</dt><dd>Model and serial number, please. See <a href="/support#service">how to request service</a>.</dd></div>
-        <div><dt>Company</dt><dd><Slot text="registered company name" /></dd></div>
       </dl>
 
       <figure class="locator plate" aria-labelledby="loc-caption">
@@ -88,7 +85,7 @@ import '../styles/pages-b.css';
           </div>
         </div>
         <div class="form-status" id="message-sent" data-form-done tabindex="-1" role="status" hidden>
-          <b>Message sent.</b> We reply<span data-done-email-wrap hidden> to <span class="nowrap" data-done-email></span></span> within <Slot text="reply time" />.<span data-done-ref-wrap hidden> Your reference: <b class="nowrap" data-done-ref></b>.</span>
+          <b>Message sent.</b> We will reply by email<span data-done-email-wrap hidden> to <span class="nowrap" data-done-email></span></span>.<span data-done-ref-wrap hidden> Your reference: <b class="nowrap" data-done-ref></b>.</span>
         </div>
         <div class="hp-field">
           <label for="c-website">Leave this field empty</label>

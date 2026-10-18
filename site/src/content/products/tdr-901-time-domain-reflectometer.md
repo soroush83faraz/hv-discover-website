@@ -63,10 +63,7 @@ specs:
       - { label: Test methods, value: "TDR, ARM, ICM" }
       - { label: Measuring range, value: "100", unit: km }
       - { label: Sampling frequency, value: "200", unit: MHz }
-      - { label: Measurement error, slot: to confirm }
       - { label: Gain, value: Adjustable }
-      - { label: Maximum clarity, value: "0.4", unit: micron, slot: meaning to confirm }
-      - { label: Surge pulse reception, value: "32", unit: V, slot: meaning to confirm }
   - group: Display and data
     rows:
       - { label: Display, value: "7 {in} touch screen, readable in sunlight" }
@@ -76,7 +73,6 @@ specs:
   - group: Connections
     rows:
       - { label: Test lead, value: Screw-lock socket on the panel }
-      - { label: Jack socket, value: On the panel, slot: function to confirm }
   - group: Power and environment
     rows:
       - { label: Battery, value: "Internal, rechargeable, up to 7", unit: h }
@@ -93,9 +89,8 @@ specs:
   - group: Service
     rows:
       - { label: Calibration, value: Approval and certificate supplied }
-      - { label: Manual, value: English, slot: English manual availability }
 
-inTheBoxNote: From the datasheet. Quantities to confirm.
+inTheBoxNote: From the datasheet.
 inTheBox:
   - item: USB cable for data transfer
   - item: Cable to the short-gap filter
@@ -106,8 +101,7 @@ inTheBox:
 inTheBoxFigure:
   image: 1
   alt: "The TDR-901 open with its kit: a test lead in the front socket, red and black clip leads, a mains adapter and an orange impulse current coupler with its cable."
-  caption: "As photographed. The clip leads, mains adapter and impulse current coupler are not named on the datasheet list:"
-  slot: confirm scope of supply
+  caption: "As photographed. The clip leads, mains adapter and impulse current coupler are not named on the datasheet list: ask us whether your quote includes them."
 
 worksWith: [arm-filter, pg-10-surge-generator, pg-32-surge-generator]
 worksWithLead: Alone, the TDR-901 finds opens and shorts. A high-resistance fault needs a surge generator as well, joined to the reflectometer through the ARM Filter.

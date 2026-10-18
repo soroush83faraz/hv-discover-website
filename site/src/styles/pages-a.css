@@ -78,7 +78,6 @@
   font-stretch: var(--wd-text); font-size: var(--fs-18); font-weight: 600;
   line-height: 1.35; letter-spacing: 0;
 }
-.datasheet--none { color: var(--screen); }
 
 /* ARM Filter: the method in two traces and one schematic */
 .traces { display: grid; gap: var(--s-4); }

@@ -19,7 +19,6 @@ import WorkflowLine from '../../components/WorkflowLine.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import NameplateTile from '../../components/NameplateTile.astro';
 import QuoteBand from '../../components/QuoteBand.astro';
-import Slot from '../../components/Slot.astro';
 import ArcReflection from '../../components/product/ArcReflection.astro';
 import SurgeCompare from '../../components/product/SurgeCompare.astro';
 import { getFamily } from '../../data/families';
@@ -92,13 +91,9 @@ const lead = d.images[0];
           <Button variant="secondary" href={askHref(product, SITE.email)}>Ask a question</Button>
         </div>
         {
-          d.datasheet ? (
+          d.datasheet && (
             <p class="datasheet">
               <a href={d.datasheet.url}>Datasheet (PDF)</a> {d.datasheet.note && <span>{d.datasheet.note}</span>}
-            </p>
-          ) : (
-            <p class="datasheet datasheet--none">
-              <span>Datasheet in preparation.</span>
             </p>
           )
         }
@@ -147,12 +142,6 @@ const lead = d.images[0];
             {d.specsNote && (
               <p class="spec-note">
                 <Fragment set:html={inline(d.specsNote.text)} />
-                {d.specsNote.slot && (
-                  <>
-                    {' '}
-                    <Slot text={d.specsNote.slot} />
-                  </>
-                )}
               </p>
             )}
           </div>
@@ -191,15 +180,7 @@ const lead = d.images[0];
                     decoding="async"
                   />
                 </div>
-                <figcaption class="figure-caption">
-                  {boxFigure.caption}
-                  {boxFigure.slot && (
-                    <>
-                      {' '}
-                      <Slot text={boxFigure.slot} />
-                    </>
-                  )}
-                </figcaption>
+                <figcaption class="figure-caption">{boxFigure.caption}</figcaption>
               </figure>
             )}
           </div>

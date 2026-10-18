@@ -53,7 +53,6 @@ specs:
       - { label: Acoustic channel, value: "80", unit: dB }
       - { label: Noise reduction, value: Noise reduction and adaptive noise reduction }
       - { label: Measurement accuracy, value: "0.1", unit: m }
-      - { label: Maximum clarity, value: "0.4", unit: micron, slot: meaning to confirm }
   - group: Receiver and sensor
     rows:
       - { label: Display, value: "4.5 {in}, colour, signal trace and level bars" }
@@ -75,9 +74,8 @@ specs:
   - group: Service
     rows:
       - { label: Calibration, value: Approval and certificate supplied }
-      - { label: Manual, value: English, slot: English manual availability }
 
-inTheBoxNote: From the datasheet. Quantities to confirm.
+inTheBoxNote: From the datasheet.
 inTheBox:
   - item: Headphones
   - item: Charger
@@ -87,8 +85,7 @@ inTheBox:
 inTheBoxFigure:
   image: 1
   alt: "The AP-01 packed in its orange hard case: the orange ground sensor, the receiver, coiled cables, headphones and the neck strap in cut foam."
-  caption: "As photographed. The telescopic rod and the neck strap are not named on the datasheet list:"
-  slot: confirm scope of supply
+  caption: "As photographed. The telescopic rod and the neck strap are not named on the datasheet list: ask us whether your quote includes them."
 
 worksWith: [pg-10-surge-generator, pg-32-surge-generator, crt-015-cable-route-tracer]
 worksWithLead: The AP-01 listens for the surges a PG-10 or PG-32 fires. The CRT-015 shows where the cable runs, so the crew walks the right line.

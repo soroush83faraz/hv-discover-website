@@ -6,6 +6,10 @@
  * - Scenario: ?trace=N (1–10) forces one; otherwise random, never the previous visit's
  *   (localStorage `hvd-hero-last`; plain random when storage fails). "Show another trace"
  *   picks a different one and replays the shot.
+ * - The scenario's text is set at load; the trace itself (synthesis, SVG, the first layout read) is
+ *   built when the panel comes within half a screen of the viewport, or at once when the visitor
+ *   reaches it first (focus, pointer, "Show another trace"). The instrument sits below the first
+ *   screen on Home, so none of that work competes with the page load.
  * - The shot plays when the trace scrolls into view (IntersectionObserver); with reduced motion
  *   the final frame shows at once.
  * - Pointer, touch drag and keys (arrows, Shift+arrows, PageUp/PageDown, Home/End) move the cursor;
@@ -775,6 +779,7 @@ function setupInstrument(root: HTMLElement): void {
 
   let dragging = false;
   plot.addEventListener('pointerdown', (e) => {
+    ensure();
     if (!geo) return;
     dragging = true;
     try {
@@ -862,6 +867,7 @@ function setupInstrument(root: HTMLElement): void {
   }
 
   nextBtn.addEventListener('click', () => {
+    ensure();
     const i = randomExcept(m.index);
     show(i, !reduceMotion);
     window.clearTimeout(announceTimer);
@@ -869,9 +875,10 @@ function setupInstrument(root: HTMLElement): void {
   });
 
   /* -------------------------------------------------------- start + resize */
+  let built = false;
   function init(): void {
-    remember(m.index);
-    applyText();
+    if (built) return;
+    built = true;
     if (!build() || !geo) return;
     // Play the shot when the visitor can see it (on phones the trace sits below the fold).
     if (!reduceMotion && 'IntersectionObserver' in window) {
@@ -914,11 +921,31 @@ function setupInstrument(root: HTMLElement): void {
   // only keeps the first frame from being measured against the fallback face.
   let started = false;
   const go = (): void => {
-    if (!started) {
-      started = true;
+    if (started) return;
+    started = true;
+    remember(m.index);
+    applyText();
+    if (!('IntersectionObserver' in window)) {
       init();
+      return;
     }
+    const near = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((en) => en.isIntersecting)) {
+          near.disconnect();
+          init();
+        }
+      },
+      { rootMargin: '50% 0px' },
+    );
+    near.observe(root);
   };
+  /** The visitor got to the instrument before it came near the viewport: build it now. */
+  function ensure(): void {
+    go();
+    init();
+  }
+  plot.addEventListener('focus', ensure);
   if (document.fonts?.status === 'loaded') go();
   else {
     document.fonts?.ready.then(go);

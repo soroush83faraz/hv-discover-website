@@ -21,6 +21,8 @@ export interface Family {
   text: string;
   /** Accessible name of the family line diagram (FamilyDiagram.astro) */
   diagramLabel: string;
+  /** Home "Four jobs" card (SolutionCards.astro): the job as a plain verb phrase, and one sentence. Steps 1 to 4 only. */
+  job?: { title: string; text: string };
 }
 
 export const FAMILIES: Family[] = [
@@ -33,6 +35,7 @@ export const FAMILIES: Family[] = [
     task: 'Measure the distance to the fault.',
     text: 'A low-voltage pulse goes into the cable. The time its reflection takes to come back gives the distance to the fault.',
     diagramLabel: 'Diagram: a TDR trace with a launch pulse and a reflection from the fault',
+    job: { title: 'Find the distance', text: 'A reflectometer times the echo of a low-voltage pulse and gives the distance to the fault in metres.' },
   },
   {
     step: 2,
@@ -43,6 +46,7 @@ export const FAMILIES: Family[] = [
     task: 'Break the fault down so it can be found.',
     text: 'A high-voltage surge breaks down high-resistance and intermittent faults, so they reflect clearly and flash over audibly.',
     diagramLabel: 'Diagram: repeated surge impulses, a sharp rise and a slow decay',
+    job: { title: 'Make the fault show', text: 'A high-voltage surge breaks down high-resistance and intermittent faults, so they reflect clearly and flash over audibly.' },
   },
   {
     step: 3,
@@ -53,6 +57,7 @@ export const FAMILIES: Family[] = [
     task: 'Find the exact spot to dig.',
     text: 'Walk the route while the surge generator fires and listen for the discharge through the ground. The loudest point is where you dig.',
     diagramLabel: 'Diagram: sound waves rising from a fault in a buried cable to a sensor on the ground',
+    job: { title: 'Pinpoint the spot', text: 'Walk the route while the surge generator fires and listen for the discharge through the ground: the loudest point is where you dig.' },
   },
   {
     step: 4,
@@ -63,6 +68,7 @@ export const FAMILIES: Family[] = [
     task: 'Follow the cable path.',
     text: 'A transmitter puts a signal on the cable and a receiver follows it, so the measured distance lands on the right street.',
     diagramLabel: 'Diagram: a cable route followed along a street grid',
+    job: { title: 'Follow the route', text: 'A transmitter puts a signal on the cable and a receiver follows it, so the measured distance lands on the right street.' },
   },
   {
     step: 'system',

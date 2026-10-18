@@ -8,8 +8,10 @@
  *   {kV}           a unit, rendered as <span class="unit">kV</span>
  *   ~TDR-901~      no line break inside, rendered as <span class="nowrap">TDR-901</span>
  *   [label](/url)  a link
- * Everything else is escaped. Unconfirmed facts go in a `slot` field, never in the text:
- * they render through Slot.astro as a dashed "[to confirm]" placeholder.
+ * Everything else is escaped. A fact that is not confirmed is left out (never guessed). A `slot`
+ * field still renders through Slot.astro as a dashed "[to confirm]" placeholder, but the build
+ * fails on any placeholder left in dist/ (scripts/no-placeholders.mjs), so use it only while
+ * drafting.
  */
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
@@ -81,7 +83,7 @@ const products = defineCollection({
       /** Accessible description of the drawing. */
       drawingAlt: z.string().optional(),
 
-      /** Datasheet link, or null when there is none yet ("Datasheet in preparation."). */
+      /** Datasheet link, or null when there is none (the page then shows no datasheet line). */
       datasheet: z
         .object({
           url: z.string(),
@@ -111,21 +113,21 @@ const products = defineCollection({
           }),
         )
         .default([]),
-      /** Note under the spec tables (inline), with an optional slot after it. */
-      specsNote: z.object({ text: z.string(), slot: z.string().optional() }).optional(),
+      /** Note under the spec tables (inline). */
+      specsNote: z.object({ text: z.string() }).strict().optional(),
 
       /** "In the box" list. qty is shown right-aligned when known. */
       inTheBox: z.array(z.object({ item: z.string(), qty: z.string().optional() })).default([]),
       /** Line under the "In the box" heading. */
       inTheBoxNote: z.string().optional(),
-      /** Photo beside the list: index into `images`, its own alt, a caption and an optional slot. */
+      /** Photo beside the list: index into `images`, its own alt and a caption. */
       inTheBoxFigure: z
         .object({
           image: z.number().int().min(0),
           alt: z.string(),
           caption: z.string(),
-          slot: z.string().optional(),
         })
+        .strict()
         .optional(),
 
       /** Slugs of the products shown under "Works with" (the van is "cable-test-van"). */

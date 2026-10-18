@@ -11,6 +11,7 @@
     "build:preview": "node scripts/build-preview.mjs",
     "preview": "astro preview --port 4330",
     "check": "astro check",
+    "check:placeholders": "node scripts/no-placeholders.mjs",
     "astro": "astro"
   },
   "dependencies": {

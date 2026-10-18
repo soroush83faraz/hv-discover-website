@@ -2,6 +2,9 @@
 /**
  * Placeholder for a fact we do not have yet: dashed underline, grey, "[to confirm]".
  * Pass the text without brackets. Never invent a value instead of using this.
+ * Drafting only: the production build fails on any placeholder left in dist/
+ * (scripts/no-placeholders.mjs; HVD_ALLOW_PLACEHOLDERS lets named pages through). On the
+ * published site an unknown fact is left out, not shown as a placeholder.
  *   <Slot />                      → [to confirm]
  *   <Slot text="to follow" />     → [to follow]
  */

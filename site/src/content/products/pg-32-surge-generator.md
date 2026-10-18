@@ -82,7 +82,6 @@ specs:
     rows:
       - { label: Output voltage display, value: "Pointer kV meter; LED scale around the voltage knob, 0 to 30 {kV}" }
       - { label: Panel indicators, value: "Closed and Separated beside the HV switch; Over-V and Under-V beside the mains inlet, as labelled" }
-      - { label: Protection systems, value: "F.U and F.Ω", slot: function to confirm }
       - { label: Level indicator, value: Bubble level on the panel }
   - group: Connections
     rows:
@@ -98,7 +97,6 @@ specs:
   - group: Mechanical
     rows:
       - { label: "Dimensions (L × W × H)", value: "540 × 400 × 500", unit: mm }
-      - { label: Height with top handle, value: "59", slot: unit to confirm }
       - { label: Weight, value: "45", unit: kg }
       - { label: Case, value: "Steel, powder-coated: orange frame, grey panels" }
       - { label: Cooling, value: Fans behind grilles in the side panels }
@@ -107,7 +105,6 @@ specs:
   - group: Service
     rows:
       - { label: Calibration, value: Approval and certificate supplied }
-      - { label: Manual, value: English, slot: English manual availability }
 
 inTheBox:
   - { item: Protection earth rod, qty: "1" }
@@ -120,8 +117,7 @@ inTheBox:
 inTheBoxFigure:
   image: 6
   alt: "The PG-32 with its accessories laid out in front: red clamp leads, earth leads with clips, the discharge probe and two T-handle earth spikes."
-  caption: "As photographed. The two T-handle earth spikes are not on the datasheet list:"
-  slot: confirm scope of supply
+  caption: "As photographed. The two T-handle earth spikes are not on the datasheet list: ask us whether your quote includes them."
 
 worksWith: [tdr-901-time-domain-reflectometer, arm-filter, ap-01-acoustic-pinpointer]
 worksWithLead: Through the ARM Filter the PG-32 feeds the TDR-901 for arc reflection, and its discharges are what the AP-01 listens for.

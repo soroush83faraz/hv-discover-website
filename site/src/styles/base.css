@@ -61,6 +61,8 @@ a:hover { text-decoration-thickness: 2px; }
 .section--white { background: var(--white); border-block: 1px solid var(--rule); }
 .section--rule { border-top: 1px solid var(--rule); }
 .section--white + .section, .section + .section--white, .section + .section--rule { padding-top: var(--section); }
+.section--dark { background: var(--semicon); color: var(--white); }
+.section + .section--dark, .section--dark + .section { padding-top: var(--section); }
 
 /* section head: H2 left, lead right on wide screens */
 .section-head { display: grid; gap: var(--s-2); margin-bottom: var(--s-6); }

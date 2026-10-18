@@ -1,25 +1,39 @@
 ---
 /**
- * Home: port of design/mockups/index.html.
- * Hero instrument, the four-step workflow, the cable test van, the six instrument tiles
- * with the van as a showcase tile (no quote button), support, and the quote starter.
+ * Home. The first screen says what we sell and what it does: the job in plain words, what we
+ * supply, three real figures and the core instruments as one group (EquipmentGroup). Then the
+ * four jobs with an instrument for each (SolutionCards), the dark "Every cable fault has an
+ * address" band with the TDR instrument, the cable test van, support and the quote starter.
+ * The product tiles live on /products only (Add to quote: product pages and the catalogue).
  */
 import { Picture } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TdrInstrument from '../components/TdrInstrument.astro';
-import WorkflowLine from '../components/WorkflowLine.astro';
-import NameplateTile from '../components/NameplateTile.astro';
+import EquipmentGroup from '../components/EquipmentGroup.astro';
+import SolutionCards from '../components/SolutionCards.astro';
 import QuoteStarter from '../components/QuoteStarter.astro';
 import Button from '../components/Button.astro';
-import Slot from '../components/Slot.astro';
-import { getProducts } from '../lib/products';
+import { getProduct } from '../lib/products';
+import { COPY } from '../scripts/tdr/scenarios';
 import { SITE } from '../data/site';
 import vanExterior from '../assets/img/van-exterior.jpg';
 import vanInterior from '../assets/img/van-interior.jpg';
+import '../styles/home.css';
 
-const products = await getProducts();
-const instruments = products.filter((p) => p.data.family !== 'system');
-const van = products.find((p) => p.data.family === 'system');
+/** A key figure from a product file (the single source of truth); the build fails if it is gone. */
+async function keyFigure(slug: string, label: string): Promise<{ value: string; unit: string }> {
+  const f = (await getProduct(slug)).data.keyFigures.find((k) => k.label === label);
+  if (!f?.value || !f.unit) throw new Error(`Home: key figure "${label}" missing in ${slug}`);
+  return { value: f.value, unit: f.unit };
+}
+const range = await keyFigure('tdr-901-time-domain-reflectometer', 'Range');
+const surge = await keyFigure('pg-32-surge-generator', 'DC output');
+const band = await keyFigure('ap-01-acoustic-pinpointer', 'Frequency range');
+const facts = [
+  { label: 'Range up to', value: range.value, unit: range.unit },
+  { label: 'Surge up to', value: surge.value.split('–').pop()!, unit: surge.unit },
+  { label: 'Acoustic band', value: band.value.replace('–', ' to '), unit: band.unit },
+];
 
 const organization = {
   '@context': 'https://schema.org',
@@ -41,29 +55,46 @@ const organization = {
   description="Instruments that turn a failed underground cable into a distance in metres, then into the exact spot to dig: TDR, surge generators, pinpointer and route tracer."
   jsonLd={[organization]}
 >
-  <!-- HERO: the instrument -->
-  <section class="hero" aria-labelledby="hero-title">
-    <div class="wrap hero__inner">
-      <div class="hero__copy">
-        <h1 class="display" id="hero-title">Every cable fault <br class="br-lg" />has an address.</h1>
-        <p class="hero__sub">Instruments that turn a failed underground cable into a distance in metres, then into the exact spot to dig.</p>
-        <div class="btn-row hero__actions">
+  <!-- HERO: what we sell and what it does -->
+  <section class="home-hero" aria-labelledby="hero-title">
+    <div class="wrap home-hero__grid">
+      <div class="home-hero__copy">
+        <h1 id="hero-title">Find the fault in an underground cable.</h1>
+        <p class="home-hero__sub">We supply cable fault location equipment: reflectometers, surge generators, acoustic pinpointers and route tracers, or all of them fitted in one test van.</p>
+        <div class="btn-row home-hero__actions">
           <Button href="#quote">Request a quote</Button>
-          <Button variant="secondary" href="/fault-location">How fault location works</Button>
+          <Button variant="secondary" href="#how-it-works">See how fault location works</Button>
         </div>
+        <ul class="home-hero__facts">
+          {facts.map((f) => <li>{f.label} <b><span class="nowrap">{f.value} {f.unit}</span></b></li>)}
+        </ul>
       </div>
-      <TdrInstrument />
+      <EquipmentGroup />
     </div>
   </section>
 
-  <!-- WORKFLOW -->
-  <section class="section workflow" id="fault-location" aria-labelledby="wf-title">
+  <!-- SOLUTIONS: four jobs, an instrument for each -->
+  <section class="section" id="solutions" aria-labelledby="jobs-title">
     <div class="wrap">
       <div class="section-head">
-        <h2 id="wf-title">Four steps from a failed cable to a dig spot.</h2>
-        <p class="lead">Fault location is a sequence. Each step narrows the search, and every instrument we supply belongs to one of them.</p>
+        <h2 id="jobs-title">Four jobs, and an instrument for each.</h2>
+        <p class="lead">Use one instrument or the whole chain. Add what you need to a quote and we reply by email.</p>
       </div>
-      <WorkflowLine />
+      <SolutionCards />
+      <p class="jobs__more"><a class="text-link" href="/products">See all instruments in the catalogue</a></p>
+    </div>
+  </section>
+
+  <!-- PROCESS: the TDR instrument -->
+  <section class="section section--dark how" id="how-it-works" aria-labelledby="how-title">
+    <div class="wrap how__grid">
+      <div class="how__copy">
+        <h2 id="how-title">Every cable fault has an address.</h2>
+        <p>A reflectometer sends a low-voltage pulse into the cable, and every joint, fault or open end sends part of it back. The time each echo takes to return gives its distance in metres.</p>
+        <p class="how__hint" id="tdr-hint">{COPY.hint}</p>
+        <a class="text-link" href="/fault-location">The four steps of fault location, in detail</a>
+      </div>
+      <TdrInstrument />
     </div>
   </section>
 
@@ -100,7 +131,6 @@ const organization = {
             <li><span class="fitted__step">Cabin</span><span class="fitted__what"><span>Control panel with meters and UPS</span></span></li>
             <li><span class="fitted__step">Rear doors</span><span class="fitted__what"><span>HV connection panel and four cable reels</span></span></li>
           </ul>
-          <p class="figure-caption">Instrument models, vehicle base, power supply and cable lengths: <Slot /></p>
         </div>
         <figure class="van__interior">
           <div class="plate">
@@ -116,22 +146,6 @@ const organization = {
           </div>
           <figcaption class="figure-caption">Inside: the instrument bench, control panel and UPS, with a pull-out drawer for the hand-held receivers.</figcaption>
         </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRODUCTS -->
-  <section class="section" id="products" aria-labelledby="products-title">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="products-title">Six instruments, one <span class="nowrap">fault-location</span> chain.</h2>
-        <p class="lead">Each instrument works on its own and as part of the sequence. Add what you need to the quote list and send it as one request. The cable test van covers all four steps.</p>
-      </div>
-      <p class="sr-only" id="quote-status" aria-live="polite"></p>
-
-      <div class="tiles">
-        {instruments.map((p) => <NameplateTile product={p} />)}
-        {van && <NameplateTile product={van} wide sizes="(min-width: 600px) 50vw, 100vw" />}
       </div>
     </div>
   </section>
